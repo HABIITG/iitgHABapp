@@ -4,18 +4,7 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9f22e541-6f34-44ad-b768-3e17d6476ce7" name="Changes" comment="itembyqr screen changes">
-      <change afterPath="$PROJECT_DIR$/frontend2/ios/Runner/Runner.entitlements" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/iitgComplaintApp.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/iitgComplaintApp.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Dart_Packages.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/libraries/Dart_Packages.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/other.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/other.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend2/ios/Podfile" beforeDir="false" afterPath="$PROJECT_DIR$/frontend2/ios/Podfile" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend2/ios/Podfile.lock" beforeDir="false" afterPath="$PROJECT_DIR$/frontend2/ios/Podfile.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend2/ios/Runner.xcodeproj/project.pbxproj" beforeDir="false" afterPath="$PROJECT_DIR$/frontend2/ios/Runner.xcodeproj/project.pbxproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend2/ios/Runner/Info.plist" beforeDir="false" afterPath="$PROJECT_DIR$/frontend2/ios/Runner/Info.plist" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend2/lib/widgets/login screen/googlesignin.dart" beforeDir="false" afterPath="$PROJECT_DIR$/frontend2/lib/widgets/login screen/googlesignin.dart" afterDir="false" />
-    </list>
+    <list default="true" id="9f22e541-6f34-44ad-b768-3e17d6476ce7" name="Changes" comment="itembyqr screen changes" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
