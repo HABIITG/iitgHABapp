@@ -6,8 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="9f22e541-6f34-44ad-b768-3e17d6476ce7" name="Changes" comment="itembyqr screen changes">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend2/lib/screens/mess_feedback/comment_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/frontend2/lib/screens/mess_feedback/comment_page.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend2/lib/screens/mess_feedback/mess_feedback_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/frontend2/lib/screens/mess_feedback/mess_feedback_page.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend2/lib/constants/endpoint.dart" beforeDir="false" afterPath="$PROJECT_DIR$/frontend2/lib/constants/endpoint.dart" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
