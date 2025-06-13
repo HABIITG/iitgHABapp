@@ -205,7 +205,11 @@ class _MenuSection extends StatefulWidget {
   State<_MenuSection> createState() => _MenuSectionState();
 }
 
- String copyMessID = '';
+
+
+
+ String MessID = '6826dfda8493bb0870b10cbf';
+
 
 String selectedDay = 'Monday';//also default this to todayday
 
@@ -222,7 +226,6 @@ class _MenuSectionState extends State<_MenuSection> {
     'Sunday',
   ];
 
-  String messidcopy = '';
 
   @override
   Widget build(BuildContext context) {
@@ -236,8 +239,9 @@ class _MenuSectionState extends State<_MenuSection> {
             const Spacer(),
             HostelDrop(onChanged: (value){
               final hostelMap = Provider.of<MessInfoProvider>(context,listen: false).hostelMap;
-               final MessID = hostelMap[value]?.messid ?? '6826dfda8493bb0870b10cbf';
-                copyMessID =MessID;
+               setState(() {
+                 MessID = hostelMap[value]?.messid ?? '6826dfda8493bb0870b10cbf';
+               });
               print("Mess ID for $value : $MessID");
             }),
           ],
@@ -313,7 +317,7 @@ class _MenuCard extends StatelessWidget {
               future: _getUserMessId(),
               builder: (context, snapshot) {
                 return MenuFutureBuilder(
-                  messId: copyMessID,
+                  messId: MessID,
                   day: selectedDay,
                   userMessId: snapshot.data,
                 );
