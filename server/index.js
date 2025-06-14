@@ -12,7 +12,6 @@ const feedbackRoute = require("./modules/feedback/feedbackRoute.js");
 const hostelRoute = require("./modules/hostel/hostelRoute.js");
 const qrRoute = require("./modules/qr/qrRoute.js");
 const messRoute = require("./modules/mess/messRoute.js");
-const cors = require("cors");
 const {
   wednesdayScheduler,
   sundayScheduler,

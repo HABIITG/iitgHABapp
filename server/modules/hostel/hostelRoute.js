@@ -7,7 +7,6 @@ const {
 const {
   createHostel,
   loginHostel,
-  loginHostel,
   getHostel,
   getAllHostels,
   applyMessChange,
