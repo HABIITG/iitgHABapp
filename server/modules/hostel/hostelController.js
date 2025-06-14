@@ -37,7 +37,20 @@ const loginHostel = async (req, res) => {
 };
 
 const getHostel = async (req, res) => {
-  return res.json({ hostel: req.hostel });
+  const { hostel_name } = req.params;
+
+  try {
+    const hostel = await Hostel.findOne({ hostel_name: hostel_name });
+
+    if (!hostel) {
+      return res.status(400).json({ message: "No such hostel" });
+    }
+
+    return res.status(200).json({ message: "Hostel found", hostel });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ message: "Error occured" });
+  }
 };
 
 const getAllHostels = async (req, res) => {
