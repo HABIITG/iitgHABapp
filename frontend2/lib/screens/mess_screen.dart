@@ -185,7 +185,7 @@ class _MessScreenState extends State<MessScreen> {
                 xbuildQuickActions(),
                 const SizedBox(height: 16),
                 _MenuSection(),
-                const SizedBox(height: 20),
+                 const SizedBox(height: 20),
                 _MessInfo(),
                 const SizedBox(height: 30),
               ],

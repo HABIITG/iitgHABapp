@@ -42,6 +42,7 @@ Future<List<MenuModel>> fetchMenu(String messId, String day) async {
       final List data = response.data;
       final menu = data.map<MenuModel>((json) => MenuModel.fromJson(json)).toList();
       _menuCache[key] = menu;
+      print(menu);
       print('✅ Menu fetched and cached for $key');
       return menu;
     } else {
