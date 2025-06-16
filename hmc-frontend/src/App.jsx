@@ -1,23 +1,47 @@
-import { Routes, Route, Navigate } from "react-router-dom";
-import { LoginPage } from "./pages/LoginPage";
-import { Dashboard } from "./pages/Dashboard.jsx"; // Create this page
-import ProtectedRoute from "./components/ProtectedRoute";
-function App() {
+import React, { useState} from "react";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import Home from "./components/Home";
+import Hostels from "./components/Hostels";
+import Mess from "./components/Mess";
+import StatisticsComplaints from "./components/StatisticsComplaints";
+import Layout from "./components/Layout";
+
+export default function App() {
+  
+  const router = createBrowserRouter([
+    {
+      path: "/",
+      element: 
+      <Layout >
+       <Home/>
+      </Layout>,
+    },
+    {
+      path: "/hostels",
+      element:
+      <Layout>
+       <Hostels/>
+      </Layout>,
+    },
+    {
+      path: "/mess",
+      element:
+      <Layout>
+       <Mess/>
+      </Layout>,
+    },
+    {
+      path: "/statisticscomplaints",
+      element:
+      <Layout>
+       <StatisticsComplaints/>
+      </Layout>,
+    },
+  ]);
   return (
-    <div className="h-screen w-screen flex justify-center items-center bg-gray-200">
-      <Routes>
-        <Route path="/" element={<Navigate to="/login" replace />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute>
-              <Dashboard />
-            </ProtectedRoute>
-          }
-        />
-      </Routes>
-    </div>
+      <div>
+        <RouterProvider router={router}/>
+      </div>
   );
 }
 export default App;
