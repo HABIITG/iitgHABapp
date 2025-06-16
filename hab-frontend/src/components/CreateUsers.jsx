@@ -2,11 +2,21 @@
 import React, { useState } from "react";
 import Papa from "papaparse";
 import { createUser } from "../apis/students.js";
-import { Upload, Button, Progress, message, Typography, Divider } from "antd";
+import {
+  Upload,
+  Button,
+  Progress,
+  message,
+  Typography,
+  Divider,
+  Row,
+  Col,
+} from "antd";
 import {
   UploadOutlined,
   FileTextOutlined,
   CheckCircleOutlined,
+  DownloadOutlined,
 } from "@ant-design/icons";
 
 const { Text, Paragraph } = Typography;
@@ -30,8 +40,17 @@ const CreateUsers = ({ onUsersCreated }) => {
       },
     });
 
-    // Prevent upload
     return false;
+  };
+
+  const handleDownloadTemplate = () => {
+    const link = document.createElement("a");
+    link.href = "/Template - Sheet1.csv";
+    link.download = "Template - Sheet1.csv";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    message.success("Template CSV downloaded successfully!");
   };
 
   const handleSubmit = async () => {
@@ -43,7 +62,7 @@ const CreateUsers = ({ onUsersCreated }) => {
     setUploading(true);
     setUploadProgress(0);
     let createdCount = 0;
-    const hostelId = "685035ff1a90f4fcf1b1988a";
+    const hostelId = "685035ff1a90f4fcf1b1988a"; //To be modified...
     const totalRecords = csvData.length;
 
     for (let i = 0; i < csvData.length; i++) {
@@ -93,30 +112,57 @@ const CreateUsers = ({ onUsersCreated }) => {
     <div style={{ padding: "8px 0" }}>
       <div style={{ marginBottom: "24px" }}>
         <Paragraph style={{ margin: 0, color: "#666" }}>
-          Upload a CSV file with student data. The CSV should contain columns:
-          <Text strong> Name, Roll Number, IITG Email</Text>
+          Upload a CSV file with student data.
         </Paragraph>
       </div>
 
-      <Upload {...uploadProps}>
-        <Button
-          icon={<UploadOutlined />}
-          size="large"
-          block
-          style={{
-            height: "50px",
-            borderStyle: "dashed",
-            borderWidth: "2px",
-          }}
-        >
-          <div>
-            <div>Click to select CSV file</div>
-            <Text type="secondary" style={{ fontSize: "12px" }}>
-              Supports .csv files only
-            </Text>
-          </div>
-        </Button>
-      </Upload>
+      <Row gutter={12} className="justify-center">
+        <Col span={11}>
+          <Button
+            icon={<DownloadOutlined />}
+            size="large"
+            block
+            onClick={handleDownloadTemplate}
+            style={{
+              height: "50px",
+              borderStyle: "dashed",
+              borderWidth: "2px",
+              borderColor: "#52c41a",
+              color: "#52c41a",
+            }}
+          >
+            <div>
+              <div>Download Template</div>
+              <Text type="secondary" style={{ fontSize: "14px" }}>
+                CSV template file
+              </Text>
+            </div>
+          </Button>
+        </Col>
+        <Col span={12}>
+          <Upload {...uploadProps}>
+            <Button
+              icon={<UploadOutlined />}
+              size="large"
+              block
+              style={{
+                height: "50px",
+                borderStyle: "dashed",
+                borderWidth: "2px",
+                borderColor: "#108ee9",
+                color: "#108ee9",
+              }}
+            >
+              <div>
+                <div>Click to select CSV file</div>
+                <Text type="secondary" style={{ fontSize: "12px" }}>
+                  Supports .csv files only
+                </Text>
+              </div>
+            </Button>
+          </Upload>
+        </Col>
+      </Row>
 
       {csvData.length > 0 && (
         <div
