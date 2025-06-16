@@ -33,7 +33,6 @@ const hostelSchema = new mongoose.Schema({
   users: {
     type: [userTimeStampSchema],
     default: [],
-    required: true,
   },
   messId: {
     type: mongoose.Schema.Types.ObjectId,

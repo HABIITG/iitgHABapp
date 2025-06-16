@@ -12,6 +12,7 @@ const feedbackRoute = require("./modules/feedback/feedbackRoute.js");
 const hostelRoute = require("./modules/hostel/hostelRoute.js");
 const qrRoute = require("./modules/qr/qrRoute.js");
 const messRoute = require("./modules/mess/messRoute.js");
+const cors = require("cors");
 const {
   wednesdayScheduler,
   sundayScheduler,
@@ -28,17 +29,13 @@ require("dotenv").config();
 const app = express();
 const MONGOdb_uri = process.env.MONGODB_URI;
 const PORT = process.env.PORT || 3000;
-// Middleware for CORS
-// app.use(
-//   cors({
-//     origin: "http://localhost:3000",
-//     methods: ["GET", "POST", "PUT", "DELETE"],
-//     credentials: true,
-//   })
-// );
 
-// console.log(PORT)
-// console.log(MONGOdb_uri)
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    credentials: true,
+  })
+);
 
 // Middleware
 app.use(express.json());
