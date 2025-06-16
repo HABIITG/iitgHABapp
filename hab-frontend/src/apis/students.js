@@ -3,7 +3,7 @@ import { BACKEND_URL } from "./server";
 
 export const getStudents = async () => {
   try {
-    const response = await axios.get(`${BACKEND_URL}/students`);
+    const response = await axios.get(`${BACKEND_URL}/users/all`);
     return response.data;
   } catch (error) {
     console.error("Error fetching students:", error);

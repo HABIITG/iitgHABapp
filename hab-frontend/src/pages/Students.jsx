@@ -1,74 +1,92 @@
+// Students.jsx (Main Component)
 import React, { useState } from "react";
-import Papa from "papaparse";
-import { createUser } from "../apis/students.js";
+import { Button, Modal } from "antd";
+import { PlusOutlined } from "@ant-design/icons";
+import CreateUsers from "../components/CreateUsers";
+import StudentList from "../components/StudentList";
 
 const Students = () => {
-  const [csvData, setCsvData] = useState([]);
-  const [uploading, setUploading] = useState(false);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const [isModalVisible, setIsModalVisible] = useState(false);
 
-  const handleFileUpload = (e) => {
-    const file = e.target.files[0];
-    Papa.parse(file, {
-      header: true,
-      skipEmptyLines: true,
-      complete: function (results) {
-        setCsvData(results.data);
-      },
-    });
+  const handleUsersCreated = () => {
+    setRefreshTrigger((prev) => prev + 1);
+    setIsModalVisible(false);
   };
 
-  const handleSubmit = async () => {
-    if (csvData.length === 0) {
-      alert("Please upload a valid CSV first.");
-      return;
-    }
-    console.log(csvData);
+  const showModal = () => {
+    setIsModalVisible(true);
+  };
 
-    setUploading(true);
-    let createdCount = 0;
-    const hostelId = "685035ff1a90f4fcf1b1988a";
-
-    for (let row of csvData) {
-      try {
-        const payload = {
-          name: row["Name"],
-          rollNumber: row["Roll Number"],
-          email: row["IITG Email"],
-          hostel: hostelId,
-        };
-        await createUser(payload);
-        createdCount++;
-      } catch (err) {
-        console.error(`Failed to create user: ${row["Name"]}`, err);
-      }
-    }
-
-    setUploading(false);
-    alert(`${createdCount} users created successfully.`);
+  const handleCancel = () => {
+    setIsModalVisible(false);
   };
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
-      <div className="max-w-xl mx-auto bg-white rounded-xl shadow-md p-6">
-        <h2 className="text-2xl font-bold mb-4 text-center">
-          Upload Student CSV
-        </h2>
-
-        <input
-          type="file"
-          accept=".csv"
-          onChange={handleFileUpload}
-          className="mb-4 block w-full text-sm text-gray-900 file:mr-4 file:py-2 file:px-4 file:border-0
-            file:text-sm file:font-semibold file:bg-sky-100 file:text-sky-700 hover:file:bg-sky-200"
-        />
-
-        <button
-          onClick={handleSubmit}
-          disabled={uploading}
-          className="w-full bg-sky-600 hover:bg-sky-700 text-white font-semibold py-2 px-4 rounded"
+    <div
+      style={{
+        padding: "24px",
+        backgroundColor: "#f5f5f5",
+        minHeight: "100vh",
+      }}
+    >
+      <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: "24px",
+            background: "#fff",
+            padding: "16px 24px",
+            borderRadius: "8px",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+          }}
         >
-          {uploading ? "Creating Users..." : "Submit"}
-        </button>
+          <h1
+            style={{
+              margin: 0,
+              fontSize: "28px",
+              fontWeight: "bold",
+              color: "#1f2937",
+            }}
+          >
+            Student Management
+          </h1>
+
+          <Button
+            type="primary"
+            icon={<PlusOutlined />}
+            size="large"
+            onClick={showModal}
+            style={{
+              borderRadius: "6px",
+              height: "40px",
+              fontWeight: "500",
+            }}
+          >
+            Add Students
+          </Button>
+        </div>
+
+        <StudentList refreshTrigger={refreshTrigger} />
+
+        <Modal
+          title={
+            <div style={{ fontSize: "20px", fontWeight: "bold" }}>
+              <PlusOutlined style={{ marginRight: "8px", color: "#1890ff" }} />
+              Upload Student CSV
+            </div>
+          }
+          open={isModalVisible}
+          onCancel={handleCancel}
+          footer={null}
+          width={600}
+          centered
+          destroyOnClose={true}
+        >
+          <CreateUsers onUsersCreated={handleUsersCreated} />
+        </Modal>
       </div>
     </div>
   );

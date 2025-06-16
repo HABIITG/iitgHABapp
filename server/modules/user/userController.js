@@ -1,4 +1,5 @@
 const { User } = require("./userModel.js");
+const { Hostel } = require("../hostel/hostelModel.js");
 
 const getUserData = async (req, res, next) => {
   //console.log(req);
@@ -114,6 +115,35 @@ const getUserComplaints = async (req, res) => {
 //     }
 // };
 
+const getAllUsers = async (req, res) => {
+  try {
+    const users = await User.find();
+
+    // Map over users and populate the hostel name
+    const updatedUsers = await Promise.all(
+      users.map(async (user) => {
+        const hostelId = user.curr_subscribed_mess;
+        let hostelName = null;
+
+        if (hostelId) {
+          const hostel = await Hostel.findById(hostelId);
+          hostelName = hostel ? hostel.hostel_name : null;
+        }
+
+        const userObj = user.toObject();
+        userObj.curr_subscribed_mess_name = hostelName;
+
+        return userObj;
+      })
+    );
+
+    res.status(200).json(updatedUsers);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Error fetching users" });
+  }
+};
+
 module.exports = {
   getUserData,
   createUser,
@@ -123,4 +153,5 @@ module.exports = {
   // getEmailsOfSecyUsers,
   getUserComplaints,
   getUserByRoll,
+  getAllUsers,
 };
