@@ -30,12 +30,12 @@ const app = express();
 const MONGOdb_uri = process.env.MONGODB_URI;
 const PORT = process.env.PORT || 3000;
 
-app.use(
+/* app.use(
   cors({
     origin: "http://localhost:5173",
     credentials: true,
   })
-);
+); */
 
 // Middleware
 app.use(express.json());
