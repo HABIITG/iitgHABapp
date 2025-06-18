@@ -6,6 +6,7 @@ import {
   ShopOutlined,
   UserOutlined,
   BookOutlined,
+  BarChartOutlined,
 } from "@ant-design/icons";
 import { useState, useEffect } from "react";
 
@@ -37,6 +38,12 @@ const Sidebar = () => {
       path: "/students",
       icon: <UserOutlined />,
     },
+    {
+      key: "5",
+      name: "Statistics & Complaints",
+      path: "/stats",
+      icon: <BarChartOutlined />,
+    }
   ];
 
   useEffect(() => {
