@@ -312,14 +312,13 @@ const toggleLikeMenuItem = async (req, res) => {
 const ScanMess = async (req, res) => {
   try {
     console.log("happending");
-
-    const messId = req.params.messId;
     const { userId } = req.body;
-    console.log(userId);
-    console.log(messId);
+    const messInfo = req.params.messId;
     // Find mess and user
-    const messInfo = await Mess.findById(mongoose.Types.ObjectId(messId));
     const user = await User.findById(userId);
+    const hostelId = Hostel.findById(user.curr_subscribed_mess);
+    const messId = hostelId.messId;
+    const userMess = await Mess.findById(messId);
 
 
     if (!user) {
@@ -344,7 +343,7 @@ const ScanMess = async (req, res) => {
 
     console.log(messInfo.hostelId, user.curr_subscribed_mess);
     // Check if user is subscribed to this mess
-    if (toString(messInfo.hostelId) !== toString(user.curr_subscribed_mess)) {
+    if (toString(messInfo.hostelId) !== toString(userMess.hostelId)) {
       return res.status(400).json({
       return res.status(400).json({
         message: "User is not subscribed to this mess",
