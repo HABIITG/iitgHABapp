@@ -435,12 +435,17 @@ const ScanMess = async (req, res) => {
 
     await scanLog.save();
 
+    // Get current time in Kolkata timezone
+    const kolkataTime = new Date(
+      new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" })
+    );
+
     return res.status(200).json({
       message: "Scan successful",
       success: true,
       mealType,
-      time: formatTime(new Date()),
-      date: formatDate(new Date()),
+      time: formatTime2(kolkataTime),
+      date: formatDate(kolkataTime),
       user: {
         name: user.name,
         rollNumber: user.rollNumber,
