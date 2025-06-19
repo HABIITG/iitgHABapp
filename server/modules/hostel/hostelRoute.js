@@ -16,7 +16,7 @@ const hostelRouter = express.Router();
 
 hostelRouter.post("/", createHostel);
 
-hostelRouter.post("/login", authenticateAdminJWT, loginHostel);
+hostelRouter.post("/login", loginHostel);
 
 hostelRouter.get("/get", authenticateAdminJWT, getHostel);
 

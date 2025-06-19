@@ -37,7 +37,7 @@ const loginHostel = async (req, res) => {
 };
 
 const getHostel = async (req, res) => {
-  return res.json(req.hostel);
+  return res.json({ hostel: req.hostel });
 };
 
 const getAllHostels = async (req, res) => {
@@ -59,12 +59,10 @@ const applyMessChange = async (req, res) => {
   const dayOfMonth = today.getDate();
 
   if (dayOfMonth < 24 || dayOfMonth > 27) {
-    return res
-      .status(403)
-      .json({
-        message:
-          "Mess change requests only allowed between 24th and 27th of a month",
-      });
+    return res.status(403).json({
+      message:
+        "Mess change requests only allowed between 24th and 27th of a month",
+    });
   }
 
   try {
@@ -120,13 +118,11 @@ const applyMessChange = async (req, res) => {
       await user.save();
 
       // await hostel.save();
-      return res
-        .status(200)
-        .json({
-          message:
-            "Sorry the cap has reached or you have already applied or you cannot apply for same hostel",
-          status_code: 1,
-        });
+      return res.status(200).json({
+        message:
+          "Sorry the cap has reached or you have already applied or you cannot apply for same hostel",
+        status_code: 1,
+      });
     }
   } catch (err) {
     console.log(err);
