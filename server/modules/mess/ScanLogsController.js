@@ -8,7 +8,6 @@ const statsByDate = async (req, res) => {
     let logs = {};
     if(!messid){
       logs = await ScanLogs.find({date: date});
-      console.log("?");
     }
     else{
       logs = await ScanLogs.find({date: date, messId: messid});
