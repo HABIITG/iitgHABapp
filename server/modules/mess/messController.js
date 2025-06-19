@@ -309,13 +309,6 @@ const toggleLikeMenuItem = async (req, res) => {
 //   }
 // };
 
-const {
-  getCurrentDate,
-  getCurrentTime,
-  getCurrentDay,
-} = require("../../utils/timeUtils");
-const { formatDate, formatTime } = require("../../utils/formatUtils"); // Assuming you have these
-
 const ScanMess = async (req, res) => {
   try {
     const { userId } = req.body;
