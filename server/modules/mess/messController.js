@@ -372,6 +372,10 @@ const ScanMess = async (req, res) => {
     const currentTime = getCurrentTime();
     const currentDay = getCurrentDay();
 
+    console.log("Current Date:", currentDate);
+    console.log("Current Time:", currentTime);
+    console.log("Current Day:", currentDay);
+
     let scanLog = await ScanLogs.findOne({
       userId,
       messId,
