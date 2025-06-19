@@ -1,9 +1,8 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
-
-const AuthContext = createContext();
+import { AuthContext } from "./AuthContext";
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -28,17 +27,20 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const logout = (reason = null) => {
-    localStorage.removeItem("token");
-    setUser(null);
-    setToken("");
+  const logout = useCallback(
+    (reason = null) => {
+      localStorage.removeItem("token");
+      setUser(null);
+      setToken("");
 
-    if (!reason) {
-      alert(`${reason}. Please log in again.`);
-    }
+      if (reason) {
+        alert(`${reason}. Please log in again.`);
+      }
 
-    navigate("/login");
-  };
+      navigate("/login");
+    },
+    [navigate]
+  );
 
   useEffect(() => {
     if (!token) {
@@ -75,7 +77,7 @@ export const AuthProvider = ({ children }) => {
     getData().finally(() => setLoading(false)); // Refresh data
 
     return () => clearTimeout(timeout); // Cleanup
-  }, [token]);
+  }, [token, logout]);
 
   return (
     <AuthContext.Provider
@@ -85,5 +87,3 @@ export const AuthProvider = ({ children }) => {
     </AuthContext.Provider>
   );
 };
-
-export const useAuth = () => useContext(AuthContext);

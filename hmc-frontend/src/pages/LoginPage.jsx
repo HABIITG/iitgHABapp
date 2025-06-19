@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { useAuth } from "../context/AuthProvider";
+import { useAuth } from "../context/AuthContext";
 
 export function LoginPage() {
   const { login } = useAuth();
@@ -32,7 +32,6 @@ export function LoginPage() {
         onChange={(e) => setSelectedHostel(e.target.value)}
       >
         <option value="">Select Your Hostel</option>
-        {console.log(hostels)}
         {hostels.map((hostel) => (
           <option key={hostel._id} value={hostel.hostel_name}>
             {hostel.hostel_name}

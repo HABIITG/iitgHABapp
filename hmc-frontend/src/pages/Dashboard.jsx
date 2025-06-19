@@ -1,4 +1,4 @@
-import { useAuth } from "../context/AuthProvider";
+import { useAuth } from "../context/AuthContext";
 
 export const Dashboard = () => {
   const { user, loading, logout } = useAuth();
@@ -8,7 +8,7 @@ export const Dashboard = () => {
     <div>
       <h1>Dashboard</h1>
       <h2>{user.hostel_name}</h2>
-      <button onClick={logout}>Logout</button>
+      <button onClick={() => logout()}>Logout</button>
     </div>
   );
 };
