@@ -316,8 +316,9 @@ const ScanMess = async (req, res) => {
     const messInfo = req.params.messId;
     // Find mess and user
     const user = await User.findById(userId);
-    const hostelId = Hostel.findById(user.curr_subscribed_mess);
-    const messId = hostelId.messId;
+    const hostel = Hostel.findById(user.curr_subscribed_mess);
+    console.log(hostel);
+    const messId = hostel.messId;
     const userMess = await Mess.findById(messId);
 
 
