@@ -384,7 +384,10 @@ const ScanMess = async (req, res) => {
       if (scanLog.breakfast) alreadyScanned = true;
       else {
         scanLog.breakfast = true;
-        scanLog.breakfastTime = new Date();
+        // Set breakfastTime in Kolkata timezone
+        scanLog.breakfastTime = new Date(
+          new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" })
+        );
       }
     } else if (
       lunch &&
@@ -395,7 +398,9 @@ const ScanMess = async (req, res) => {
       if (scanLog.lunch) alreadyScanned = true;
       else {
         scanLog.lunch = true;
-        scanLog.lunchTime = new Date();
+        scanLog.lunchTime = new Date(
+          new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" })
+        );
       }
     } else if (
       dinner &&
@@ -406,7 +411,9 @@ const ScanMess = async (req, res) => {
       if (scanLog.dinner) alreadyScanned = true;
       else {
         scanLog.dinner = true;
-        scanLog.dinnerTime = new Date();
+        scanLog.dinnerTime = new Date(
+          new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" })
+        );
       }
     }
     console.log("Scan Log:", scanLog);
