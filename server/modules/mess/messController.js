@@ -416,7 +416,7 @@ const ScanMess = async (req, res) => {
         scanLog.dinnerTime = new Date();
       }
     }
-
+    console.log("Scan Log:", scanLog);
     if (alreadyScanned) {
       const logDate = formatDate(new Date(scanLog.date));
       const logTime = formatTime(
