@@ -394,10 +394,12 @@ const ScanMess = async (req, res) => {
       Menu.findOne({ messId, day: currentDay, type: "Lunch" }),
       Menu.findOne({ messId, day: currentDay, type: "Dinner" }),
     ]);
+    console.log("Breakfast:", breakfast);
+    console.log("Lunch:", lunch);
+    console.log("Dinner:", dinner);
 
     let mealType = null;
     let alreadyScanned = false;
-
     if (
       breakfast &&
       currentTime >= breakfast.startTime &&
@@ -423,6 +425,9 @@ const ScanMess = async (req, res) => {
       if (scanLog.dinner) alreadyScanned = true;
       else scanLog.dinner = true;
     }
+
+    console.log("Meal Type:", mealType);
+    console.log("Already Scanned:", alreadyScanned);
 
     if (alreadyScanned) {
       return res.status(200).json({
