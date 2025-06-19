@@ -4,6 +4,7 @@ const { MenuItem } = require("./menuItemModel");
 const { User } = require("../user/userModel");
 const { Hostel } = require("../hostel/hostelModel");
 const { ScanLogs } = require("./ScanLogsModel.js");
+const mongoose = require("mongoose");
 
 const {
   getCurrentDate,
