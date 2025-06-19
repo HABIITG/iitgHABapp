@@ -309,57 +309,46 @@ const toggleLikeMenuItem = async (req, res) => {
 //   }
 // };
 
+const {
+  getCurrentDate,
+  getCurrentTime,
+  getCurrentDay,
+} = require("../../utils/timeUtils");
+const { formatDate, formatTime } = require("../../utils/formatUtils"); // Assuming you have these
+
 const ScanMess = async (req, res) => {
   try {
-    console.log("happening");
     const { userId } = req.body;
     const messInfoId = req.params.messId;
 
-    console.log("UserId:", userId);
-    console.log("MessInfoId:", messInfoId);
-
     const messInfo = await Mess.findById(messInfoId);
     if (!messInfo) {
-      return res.status(404).json({
-        message: "Mess not found",
-        success: false,
-      });
+      return res
+        .status(404)
+        .json({ message: "Mess not found", success: false });
     }
 
     const user = await User.findById(userId);
     if (!user) {
-      console.error("User not found");
-      return res.status(404).json({
-        message: "User not found",
-        success: false,
-      });
+      return res
+        .status(404)
+        .json({ message: "User not found", success: false });
     }
-
-    console.log("User:", user);
 
     const hostel = await Hostel.findById(user.curr_subscribed_mess);
     if (!hostel) {
-      return res.status(404).json({
-        message: "Hostel not found",
-        success: false,
-      });
+      return res
+        .status(404)
+        .json({ message: "Hostel not found", success: false });
     }
 
     const messId = hostel.messId;
     const userMess = await Mess.findById(messId);
     if (!userMess) {
-      console.error("User Mess not found");
-      return res.status(404).json({
-        message: "Mess not found",
-        success: false,
-      });
+      return res
+        .status(404)
+        .json({ message: "User mess not found", success: false });
     }
-
-    console.log("MessInfo Hostel ID:", messInfo.hostelId.toString());
-    console.log(
-      "User Subscribed Hostel ID:",
-      user.curr_subscribed_mess.toString()
-    );
 
     if (messInfo.hostelId.toString() !== user.curr_subscribed_mess.toString()) {
       return res.status(400).json({
@@ -372,16 +361,7 @@ const ScanMess = async (req, res) => {
     const currentTime = getCurrentTime();
     const currentDay = getCurrentDay();
 
-    console.log("Current Date:", currentDate);
-    console.log("Current Time:", currentTime);
-    console.log("Current Day:", currentDay);
-
-    let scanLog = await ScanLogs.findOne({
-      userId,
-      messId,
-      date: currentDate,
-    });
-
+    let scanLog = await ScanLogs.findOne({ userId, messId, date: currentDate });
     if (!scanLog) {
       scanLog = new ScanLogs({
         userId,
@@ -398,12 +378,10 @@ const ScanMess = async (req, res) => {
       Menu.findOne({ messId, day: currentDay, type: "Lunch" }),
       Menu.findOne({ messId, day: currentDay, type: "Dinner" }),
     ]);
-    console.log("Breakfast:", breakfast);
-    console.log("Lunch:", lunch);
-    console.log("Dinner:", dinner);
 
     let mealType = null;
     let alreadyScanned = false;
+
     if (
       breakfast &&
       currentTime >= breakfast.startTime &&
@@ -411,7 +389,10 @@ const ScanMess = async (req, res) => {
     ) {
       mealType = "Breakfast";
       if (scanLog.breakfast) alreadyScanned = true;
-      else scanLog.breakfast = true;
+      else {
+        scanLog.breakfast = true;
+        scanLog.breakfastTime = new Date();
+      }
     } else if (
       lunch &&
       currentTime >= lunch.startTime &&
@@ -419,7 +400,10 @@ const ScanMess = async (req, res) => {
     ) {
       mealType = "Lunch";
       if (scanLog.lunch) alreadyScanned = true;
-      else scanLog.lunch = true;
+      else {
+        scanLog.lunch = true;
+        scanLog.lunchTime = new Date();
+      }
     } else if (
       dinner &&
       currentTime >= dinner.startTime &&
@@ -427,18 +411,17 @@ const ScanMess = async (req, res) => {
     ) {
       mealType = "Dinner";
       if (scanLog.dinner) alreadyScanned = true;
-      else scanLog.dinner = true;
+      else {
+        scanLog.dinner = true;
+        scanLog.dinnerTime = new Date();
+      }
     }
 
-    console.log("Meal Type:", mealType);
-    console.log("Already Scanned:", alreadyScanned);
-
     if (alreadyScanned) {
-      let logDate = new Date(scanLog.date);
-      logDate = formatDate(logDate);
-      let logTime = new Date(scanLog[`${mealType.toLowerCase()}Time`]);
-      logTime = formatTime(logTime);
-      if (mealType=== "Breakfast") {
+      const logDate = formatDate(new Date(scanLog.date));
+      const logTime = formatTime(
+        new Date(scanLog[`${mealType.toLowerCase()}Time`])
+      );
 
       return res.status(200).json({
         message: `Already scanned for ${mealType.toLowerCase()}`,
@@ -453,8 +436,8 @@ const ScanMess = async (req, res) => {
       return res.status(400).json({
         message: "No meals available at this time",
         success: false,
-        time: formatTime(currentTime),
-        date: formatDate(currentDate),
+        time: formatTime(new Date()),
+        date: formatDate(new Date()),
       });
     }
 
@@ -464,8 +447,8 @@ const ScanMess = async (req, res) => {
       message: "Scan successful",
       success: true,
       mealType,
-      time: formatTime(currentTime),
-      date: formatDate(currentDate),
+      time: formatTime(new Date()),
+      date: formatDate(new Date()),
       user: {
         name: user.name,
         rollNumber: user.rollNumber,
