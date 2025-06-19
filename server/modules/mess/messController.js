@@ -321,6 +321,7 @@ const ScanMess = async (req, res) => {
 
 
     if (!user) {
+      console.error("User not found");
       return res.status(404).json({
         message: "User not found",
         success: false,
@@ -329,6 +330,7 @@ const ScanMess = async (req, res) => {
     }
 
     if (!messInfo) {
+      console.error("Mess not found");
       return res.status(404).json({
         message: "Mess not found",
         success: false,
