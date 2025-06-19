@@ -40,9 +40,15 @@ const Sidebar = () => {
     },
     {
       key: "5",
-      name: "Statistics & Complaints",
-      path: "/stats",
+      name: "Overall Statistics",
+      path: "/overallstats",
       icon: <BarChartOutlined />,
+    },
+    {
+      key: "6",
+      name: "Hostel Statistics",
+      path: "/hostelstats",
+      icon: <BarChartOutlined />
     }
   ];
 
