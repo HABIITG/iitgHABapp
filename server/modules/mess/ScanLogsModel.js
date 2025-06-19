@@ -19,13 +19,25 @@ const scanLogsSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  breakfastTime: {
+    type: String,
+    default: null,
+  },
   lunch: {
     type: Boolean,
     default: false,
   },
+  lunchTime: {
+    type: String,
+    default: null,
+  },
   dinner: {
     type: Boolean,
     default: false,
+  },
+  dinnerTime: {
+    type: String,
+    default: null,
   },
 });
 

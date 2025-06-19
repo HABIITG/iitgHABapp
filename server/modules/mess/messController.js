@@ -434,12 +434,18 @@ const ScanMess = async (req, res) => {
     console.log("Already Scanned:", alreadyScanned);
 
     if (alreadyScanned) {
+      let logDate = new Date(scanLog.date);
+      logDate = formatDate(logDate);
+      let logTime = new Date(scanLog[`${mealType.toLowerCase()}Time`]);
+      logTime = formatTime(logTime);
+      if (mealType=== "Breakfast") {
+
       return res.status(200).json({
         message: `Already scanned for ${mealType.toLowerCase()}`,
         success: false,
         mealType,
-        time: formatTime(currentTime),
-        date: formatDate(currentDate),
+        time: logTime,
+        date: logDate,
       });
     }
 
