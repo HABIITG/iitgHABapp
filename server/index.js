@@ -12,6 +12,7 @@ const feedbackRoute = require("./modules/feedback/feedbackRoute.js");
 const hostelRoute = require("./modules/hostel/hostelRoute.js");
 const qrRoute = require("./modules/qr/qrRoute.js");
 const messRoute = require("./modules/mess/messRoute.js");
+const logsRoute = require("./modules/mess/ScanLogsRoute.js");
 const cors = require("cors");
 const {
   wednesdayScheduler,
@@ -93,6 +94,9 @@ app.use("/api/qr", qrRoute);
 
 //mess route
 app.use("/api/mess", messRoute);
+
+//scanlogs route
+app.use("/api/logs", logsRoute);
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
