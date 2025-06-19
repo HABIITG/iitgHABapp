@@ -492,6 +492,15 @@ const formatDate = (date) => {
   } ${dateObj.getFullYear()}`;
 };
 
+const formatTime = (time) => {
+  const timeObj = new Date(`1970-01-01T${time}:00`);
+  const hours = timeObj.getHours();
+  const minutes = timeObj.getMinutes();
+  return `${hours.toString().padStart(2, "0")}:${minutes
+    .toString()
+    .padStart(2, "0")}`;
+};
+
 module.exports = {
   createMess,
   createMenu,
