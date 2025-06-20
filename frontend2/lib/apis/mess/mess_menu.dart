@@ -9,11 +9,17 @@ import '../../models/mess_menu_model.dart';
 final Map<String, List<MenuModel>> _menuCache = {};
 
 Future<List<MenuModel>> fetchMenu(String messId, String day) async {
+  final startTime = DateTime.now();
   final key = '$messId-$day';
 
   // Return from cache if available
   if (_menuCache.containsKey(key)) {
     print('✅ Returning cached menu for $key');
+
+    final endTime = DateTime.now();
+    final responseTime = endTime.difference(startTime).inMilliseconds;
+    print("⏱️ fetchMenu Response Time (from cache): $responseTime ms");
+
     return _menuCache[key]!;
   }
 
@@ -42,8 +48,13 @@ Future<List<MenuModel>> fetchMenu(String messId, String day) async {
       final List data = response.data;
       final menu = data.map<MenuModel>((json) => MenuModel.fromJson(json)).toList();
       _menuCache[key] = menu;
-      print(menu);
+      print(response.data);
       print('✅ Menu fetched and cached for $key');
+
+      final endTime = DateTime.now();
+      final responseTime = endTime.difference(startTime).inMilliseconds;
+      print("⏱️ fetchMenu Response Time (from API): $responseTime ms");
+
       return menu;
     } else {
       throw Exception('❌ Server responded with status: ${response.statusCode}');
@@ -59,5 +70,6 @@ Future<List<MenuModel>> fetchMenu(String messId, String day) async {
     throw Exception('Unexpected error while fetching menu');
   }
 }
+
 
 

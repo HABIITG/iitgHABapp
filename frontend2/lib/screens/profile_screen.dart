@@ -40,7 +40,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Future<void> getAllocatedHostel() async {
     final prefs = await SharedPreferences.getInstance();
-    final hostel1 = prefs.getString('hostel');
+    final hostel1 = prefs.getString('hostelID');//change this from hostel in user.dart
     final email1 = prefs.getString('email');
     final name1 = prefs.getString('name');
     final roll1 = prefs.getString('rollNo');

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:frontend1/apis/authentication/login.dart';
+import 'package:frontend1/apis/mess/user_mess_info.dart';
 import 'package:frontend1/providers/feedback_provider.dart';
 import 'package:frontend1/screens/Home_screen.dart';
 import 'package:frontend1/screens/MainNavigationScreen.dart';
@@ -20,6 +21,8 @@ import 'package:frontend1/screens/profile_screen.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final bool asLoggedIn = await isLoggedIn();
+  await getUserMessInfo();
+
 
   runApp(
     MultiProvider(
@@ -53,10 +56,12 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       // This ensures it runs after the first frame
-      context.read<MessInfoProvider>().fetchMessID();
+      await context.read<MessInfoProvider>().fetchMessID();
     });
+
     _connectivity = Connectivity();
 
     // Use `.map()` to transform the stream into a stream of ConnectivityResult

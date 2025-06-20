@@ -22,6 +22,7 @@ class MessInfoProvider with ChangeNotifier {
       final response = await dio.post(messInfo.getMessInfo);
       if(response.statusCode ==200){
         final data = response.data as List;
+        print('data is $data');
         _messList = data.map((e) => MessInfoModel.fromJson(e)).toList();
         _hostelMap = mapHostelsByName(_messList);
       }
