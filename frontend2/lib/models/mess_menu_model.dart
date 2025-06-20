@@ -2,7 +2,7 @@ class MenuItemModel {
   final String id;
   final String name;
   final String type;
-    bool isLiked;
+  late final bool isLiked;
 
   MenuItemModel({
     required this.id,
