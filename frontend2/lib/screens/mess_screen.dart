@@ -32,6 +32,8 @@ class _MessAppState extends State<MessApp> {
 
 
 
+
+
 class MessScreen extends StatefulWidget {
   const MessScreen({super.key});
 
@@ -327,7 +329,7 @@ class _MenuCard extends StatelessWidget {
 
   Future<String?> _getUserMessId() async {
     final prefs = await SharedPreferences.getInstance();
-   String messId = prefs.getString('curr_subscribed_mess') ?? '6826dfda8493bb0870b10cbf';
+    String messId = prefs.getString('messID') ?? '6826dfda8493bb0870b10cbf';
     return messId;
   }
 }
@@ -337,11 +339,7 @@ class _MenuCard extends StatelessWidget {
 class _MessInfo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final messInfoProvider = Provider.of<MessInfoProvider>(context, listen: false);
-    final hostelMap = messInfoProvider.hostelMap;
-    final catererName = hostelMap[currSubscribedMess]?.messname ?? 'Not found';
-    final rating = hostelMap[currSubscribedMess]?.rating.toStringAsFixed(1) ?? 'N/A';
-    final rank = hostelMap[currSubscribedMess]?.ranking.toString() ?? 'N/A';
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
@@ -363,7 +361,7 @@ class _MessInfo extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           Text(
-            catererName,
+            "fill below from shared prefs",
             style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
           ),
           const Divider(height: 32),
@@ -373,7 +371,7 @@ class _MessInfo extends StatelessWidget {
                 child: Column(
                   children: [
                     Text(
-                      rating,
+                      "rating",
                       style: const TextStyle(
                         fontSize: 24,
                         color: Color(0xFF3754DB),
@@ -389,7 +387,7 @@ class _MessInfo extends StatelessWidget {
                 child: Column(
                   children: [
                     Text(
-                      rank,
+                      "rank",
                       style: const TextStyle(
                         fontSize: 24,
                         color: Color(0xFF3754DB),
@@ -408,4 +406,3 @@ class _MessInfo extends StatelessWidget {
     );
   }
 }
-

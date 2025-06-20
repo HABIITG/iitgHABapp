@@ -57,4 +57,7 @@ class messFeedback {
 
 class messInfo {
   static const getMessInfo = "$baseUrl/mess/all";
+  static const getUserMessInfo ="$baseUrl/mess/get";
 }
+
+
