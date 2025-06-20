@@ -63,7 +63,7 @@ hostelSchema.methods.verifyPassword = function (givenPassword) {
 hostelSchema.methods.generateJWT = function () {
   let hostel = this;
   let token = jwt.sign({ hostel: hostel._id }, adminjwtsecret, {
-    expiresIn: "1d",
+    expiresIn: "2h",
   });
   return token;
 };
