@@ -4,7 +4,7 @@ import OverallStatsHeader from "./OverallStatsHeader";
 import OverallStatsCards from "./OverallStatsCards";
 import MealStatistic from "./MealStatistic";
 
-import { getStatsByDate } from "../../apis/stats";
+import { getStatsByDate, getAllHostelMessInfo } from "../../apis/stats";
 
 //function to get previous date (default displays previous date)
 function getprevdate() {
