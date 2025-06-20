@@ -6,13 +6,13 @@ const statsByDate = async (req, res) => {
     const date = req.params.date;
     const messid = req.body.messid;
     let logs = {};
-    if(!messid){
-      logs = await ScanLogs.find({date: date});
+    if (!messid) {
+      logs = await ScanLogs.find({ date: date });
     }
-    else{
-      logs = await ScanLogs.find({date: date, messId: messid});
+    else {
+      logs = await ScanLogs.find({ date: date, messId: messid });
     }
-    const stats = {total: 0, breakfast: 0, lunch: 0, dinner: 0};
+    const stats = { total: 0, breakfast: 0, lunch: 0, dinner: 0 };
     logs.forEach((item) => {
       if (item.breakfast) ++stats.breakfast;
       if (item.lunch) ++stats.lunch;
@@ -20,8 +20,6 @@ const statsByDate = async (req, res) => {
       ++stats.total;
     })
     res.status(200).json(stats);
-    console.log(logs);
-    
   }
   catch (error) {
     console.error(error);
@@ -30,7 +28,7 @@ const statsByDate = async (req, res) => {
 }
 
 //temporary function for creating sample logs
-const createLogs = async(req, res) => {
+const createLogs = async (req, res) => {
   try {
     const logsdata = req.body;
     const insertedlogs = await ScanLogs.insertMany(logsdata);
@@ -39,21 +37,21 @@ const createLogs = async(req, res) => {
       data: insertedlogs,
     })
   }
-  catch (error){
+  catch (error) {
     console.error(error);
     return res.status(500).json({ message: "Internal server error" });
   }
 }
 
 //temporary function for deleting sample logs
-const deleteall = async(req, res) => {
+const deleteall = async (req, res) => {
   try {
     await ScanLogs.deleteMany();
     res.status(200).json({
       message: "Successfulyy deleted everything!",
     })
   }
-  catch (error){
+  catch (error) {
     console.error(error);
     return res.status(500).json({ message: "Internal server error" });
   }
