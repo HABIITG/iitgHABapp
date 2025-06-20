@@ -5,7 +5,7 @@ function OverallStatsCards({ stats }) {
   let sum = 0;
   let first = "breakfast";
   for (const key in stats) {
-    if (key != "total") {
+    if (key == "breakfast" || key == "lunch" || key == "dinner") {
       sum += stats[key];
       if (stats[key] > stats[first]) first = key;
     }

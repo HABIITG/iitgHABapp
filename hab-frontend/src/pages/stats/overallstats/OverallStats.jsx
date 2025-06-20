@@ -3,8 +3,9 @@ import { useState, useEffect } from "react";
 import OverallStatsHeader from "./OverallStatsHeader";
 import OverallStatsCards from "./OverallStatsCards";
 import MealStatistic from "./MealStatistic";
+import TopHostelStatistic from "./TopHostelStatistic";
 
-import { getStatsByDate, getAllHostelMessInfo } from "../../apis/stats";
+import { getStatsByDate, getAllHostelMessInfo } from "../../../apis/stats";
 
 //function to get previous date (default displays previous date)
 function getprevdate() {
@@ -22,14 +23,24 @@ function OverallStats() {
 
   const [date, setDate] = useState(getprevdate());
   const [stats, setStats] = useState({});
+  const [hostelData, setHostelData] = useState({});
 
   const fetchStats = async () => {
     let data = await getStatsByDate(date);
     setStats(data);
   };
+  const fetchHostels = async () => {
+    let data = await getAllHostelMessInfo();
+    setHostelData(data);
+  }
+
   useEffect(() => {
     fetchStats();
   }, [date]);
+
+  useEffect(() => {
+    fetchHostels();
+  }, [])
 
   return (
     <div className="p-4 min-h-full m-auto">
@@ -42,6 +53,8 @@ function OverallStats() {
         <MealStatistic meal="Breakfast" date={date} stats={stats} />
         <MealStatistic meal="Lunch" date={date} stats={stats} />
         <MealStatistic meal="Dinner" date={date} stats={stats} />
+
+        <TopHostelStatistic stats={stats} data={hostelData}/>
 
       </div>
     </div>

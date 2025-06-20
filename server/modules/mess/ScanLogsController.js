@@ -12,13 +12,47 @@ const statsByDate = async (req, res) => {
     else {
       logs = await ScanLogs.find({ date: date, messId: messid });
     }
-    const stats = { total: 0, breakfast: 0, lunch: 0, dinner: 0 };
+    const stats = { total: 0, breakfast: 0, lunch: 0, dinner: 0, highest: ["",0], lowest: ["",0] };
+
+    //For finding highest and lowest attendance mess
+    const messwisestats = {};
+
     logs.forEach((item) => {
-      if (item.breakfast) ++stats.breakfast;
-      if (item.lunch) ++stats.lunch;
-      if (item.dinner) ++stats.dinner;
+      if(!(item.messId in messwisestats)) messwisestats[item.messId] = [0,0];
+      if (item.breakfast){
+        ++messwisestats[item.messId][0];
+        ++stats.breakfast;
+      } 
+      if (item.lunch){
+        ++messwisestats[item.messId][0];
+        ++stats.lunch;
+      } 
+      if (item.dinner){
+        ++messwisestats[item.messId][0];
+        ++stats.dinner;
+      } 
       ++stats.total;
+      ++messwisestats[item.messId][1]
     })
+
+    //looping through the messes to find highest and lowest
+    for(const key in messwisestats){
+      const attendance = (messwisestats[key][0]/messwisestats[key][1]/3*100).toFixed(1);
+      if (!stats.highest[0]){
+        stats.lowest[0] = key; stats.lowest[1] = attendance
+        stats.highest[0] = key; stats.highest[1] = attendance
+      }
+      else if (attendance > stats.highest[1]){
+        console.log("hello?")
+        stats.highest[0] = key;
+        stats.highest[1] = attendance
+      }
+      else if (attendance < stats.lowest[1]){
+        stats.lowest[0] = key;
+        stats.lowest[1] = attendance;
+      }
+    }
+
     res.status(200).json(stats);
   }
   catch (error) {
