@@ -4,6 +4,7 @@ const { MenuItem } = require("./menuItemModel");
 const { User } = require("../user/userModel");
 const { Hostel } = require("../hostel/hostelModel");
 const { ScanLogs } = require("./ScanLogsModel.js");
+const mongoose = require("mongoose");
 
 const {
   getCurrentDate,
@@ -310,185 +311,206 @@ const toggleLikeMenuItem = async (req, res) => {
 
 const ScanMess = async (req, res) => {
   try {
-    console.log("happending")
-    
-    const messId = req.params.messId;
-    const { qr_string, userId } = req.body;
-    console.log(userId)
-    // Find mess and user
-    const messInfo = await Mess.findById(messId);
-    const user = await User.findById(userId);
-    
-    if (!user) {
-      return res.status(404).json({ 
-        message: "User not found",
-        success: false 
-      });
-    }
-    
+    const { userId } = req.body;
+    const messInfoId = req.params.messId;
+
+    const messInfo = await Mess.findById(messInfoId);
     if (!messInfo) {
-      return res.status(404).json({ 
-        message: "Mess not found",
-        success: false 
-      });
+      return res
+        .status(404)
+        .json({ message: "Mess not found", success: false });
     }
-    
-    
-    console.log(messInfo.hostelId,  user.curr_subscribed_mess)
-    // Check if user is subscribed to this mess
-    if (toString(messInfo.hostelId) !== toString(user.curr_subscribed_mess)) {
-      return res.status(400).json({ 
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res
+        .status(404)
+        .json({ message: "User not found", success: false });
+    }
+
+    const hostel = await Hostel.findById(user.curr_subscribed_mess);
+    if (!hostel) {
+      return res
+        .status(404)
+        .json({ message: "Hostel not found", success: false });
+    }
+
+    const messId = hostel.messId;
+    const userMess = await Mess.findById(messId);
+    if (!userMess) {
+      return res
+        .status(404)
+        .json({ message: "User mess not found", success: false });
+    }
+
+    if (messInfo.hostelId.toString() !== user.curr_subscribed_mess.toString()) {
+      return res.status(400).json({
         message: "User is not subscribed to this mess",
-        success: false 
+        success: false,
       });
     }
 
-    
     const currentDate = getCurrentDate();
     const currentTime = getCurrentTime();
     const currentDay = getCurrentDay();
-    
-    // Find existing scan log for today
-    let scanLog = await ScanLogs.findOne({ 
-      userId: userId, 
-      messId: messId, 
-      date: currentDate 
-    });
-    
-    // If no scan log exists for today, create one
+
+    let scanLog = await ScanLogs.findOne({ userId, messId, date: currentDate });
     if (!scanLog) {
       scanLog = new ScanLogs({
-        userId: userId,
-        messId: messId,
+        userId,
+        messId,
         date: currentDate,
         breakfast: false,
         lunch: false,
-        dinner: false
+        dinner: false,
       });
     }
-    
-    // Check meal timings and availability
-    const breakfast = await Menu.findOne({
-      messId: messId,
-      day: currentDay,
-      type: "Breakfast",
-    });
-    
-    const lunch = await Menu.findOne({
-      messId: messId,
-      day: currentDay,
-      type: "Lunch",
-    });
-    
-    const dinner = await Menu.findOne({
-      messId: messId,
-      day: currentDay,
-      type: "Dinner",
-    });
-    
+
+    const [breakfast, lunch, dinner] = await Promise.all([
+      Menu.findOne({ messId, day: currentDay, type: "Breakfast" }),
+      Menu.findOne({ messId, day: currentDay, type: "Lunch" }),
+      Menu.findOne({ messId, day: currentDay, type: "Dinner" }),
+    ]);
+
     let mealType = null;
     let alreadyScanned = false;
-    
-    // Check breakfast timing
-    if (breakfast && currentTime >= breakfast.startTime && currentTime <= breakfast.endTime) {
-      if (!scanLog.breakfast) {
+
+    if (
+      breakfast &&
+      currentTime >= breakfast.startTime &&
+      currentTime <= breakfast.endTime
+    ) {
+      mealType = "Breakfast";
+      if (scanLog.breakfast) alreadyScanned = true;
+      else {
         scanLog.breakfast = true;
-        mealType = "Breakfast";
-      } else {
-        alreadyScanned = true;
-        mealType = "Breakfast";
+        // Set breakfastTime in Kolkata timezone
+        scanLog.breakfastTime = new Date(
+          new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" })
+        );
       }
-    }
-    // Check lunch timing
-    else if (lunch && currentTime >= lunch.startTime ) {
-      if (!scanLog.lunch) {
+    } else if (
+      lunch &&
+      currentTime >= lunch.startTime &&
+      currentTime <= lunch.endTime
+    ) {
+      mealType = "Lunch";
+      if (scanLog.lunch) alreadyScanned = true;
+      else {
         scanLog.lunch = true;
-        mealType = "Lunch";
-      } else {
-        alreadyScanned = true;
-        mealType = "Lunch";
+        scanLog.lunchTime = new Date(
+          new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" })
+        );
       }
-    }
-    // Check dinner timing
-    else if (dinner && currentTime >= dinner.startTime && currentTime <= dinner.endTime) {
-      if (!scanLog.dinner) {
+    } else if (
+      dinner &&
+      currentTime >= dinner.startTime &&
+      currentTime <= dinner.endTime
+    ) {
+      mealType = "Dinner";
+      if (scanLog.dinner) alreadyScanned = true;
+      else {
         scanLog.dinner = true;
-        mealType = "Dinner";
-      } else {
-        alreadyScanned = true;
-        mealType = "Dinner";
+        scanLog.dinnerTime = new Date(
+          new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" })
+        );
       }
     }
-    
-    // If already scanned for current meal
+    console.log("Scan Log:", scanLog);
     if (alreadyScanned) {
-      return res.status(200).json({ 
+      const logDate = formatDate(scanLog.date);
+      const logTime = formatTime2(scanLog[`${mealType.toLowerCase()}Time`]);
+      console.log("Already scanned logTime:", logTime);
+      console.log("Already scanned logDate:", logDate);
+      return res.status(200).json({
         message: `Already scanned for ${mealType.toLowerCase()}`,
         success: false,
-        mealType: mealType,
-        time: formatTime(currentTime),
-        date: formatDate(currentDate)
+        mealType,
+        time: logTime,
+        date: logDate,
       });
     }
-    
-    // If no meal is available at current time
+
     if (!mealType) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         message: "No meals available at this time",
         success: false,
-        time: formatTime(currentTime),
-        date: formatDate(currentDate)
+        time: formatTime(new Date()),
+        date: formatDate(new Date()),
       });
     }
-    
-    // Save the scan log
+
     await scanLog.save();
-    
-    // Return success response with user details
-    return res.status(200).json({ 
+
+    // Get current time in Kolkata timezone
+    const kolkataTime = new Date(
+      new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" })
+    );
+
+    return res.status(200).json({
       message: "Scan successful",
       success: true,
-      mealType: mealType,
-      time: formatTime(currentTime),
-      date: formatDate(currentDate),
+      mealType,
+      time: formatTime2(kolkataTime),
+      date: formatDate(kolkataTime),
       user: {
         name: user.name,
         rollNumber: user.rollNumber,
-        // Hardcoded image for now as requested
-        photo: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
+        photo:
+          "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=1000&q=80",
         hostel: user.hostel,
         year: user.year,
-        degree: user.degree
-      }
+        degree: user.degree,
+      },
     });
-    
   } catch (error) {
     console.error("Error in ScanMess:", error);
-    return res.status(500).json({ 
+    return res.status(500).json({
       message: "Internal server error",
       success: false,
-      error: error.message 
+      error: error.message,
     });
   }
-};
-
-const formatTime = (time) => {
-  const [hours, minutes] = time.split(':');
-  const hour = parseInt(hours);
-  const period = hour >= 12 ? 'PM' : 'AM';
-  const displayHour = hour > 12 ? hour - 12 : (hour === 0 ? 12 : hour);
-  return `${displayHour}:${minutes} ${period}`;
 };
 
 const formatDate = (date) => {
   const dateObj = new Date(date);
   const months = [
-    'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
   ];
-  return `${dateObj.getDate()} ${months[dateObj.getMonth()]} ${dateObj.getFullYear()}`;
+  return `${dateObj.getDate()} ${
+    months[dateObj.getMonth()]
+  } ${dateObj.getFullYear()}`;
 };
 
+const formatTime = (time) => {
+  const timeObj = new Date(`1970-01-01T${time}:00`);
+  const hours = timeObj.getHours();
+  const minutes = timeObj.getMinutes();
+  return `${hours.toString().padStart(2, "0")}:${minutes
+    .toString()
+    .padStart(2, "0")}`;
+};
+
+const formatTime2 = (time) => {
+  const timeObj = new Date(time);
+  const hours = timeObj.getHours();
+  const minutes = timeObj.getMinutes();
+  return `${hours.toString().padStart(2, "0")}:${minutes
+    .toString()
+    .padStart(2, "0")}`;
+};
 
 module.exports = {
   createMess,
