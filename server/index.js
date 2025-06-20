@@ -1,7 +1,7 @@
 // server/index.js
 //import authRoutes from "./modules/auth/auth.routes.js";
 const authRoutes = require("./modules/auth/auth.routes.js");
-
+const cors = require("cors");
 const express = require("express");
 const mongoose = require("mongoose");
 const itemRoute = require("./modules/item/itemRoute.js");
@@ -12,6 +12,7 @@ const feedbackRoute = require("./modules/feedback/feedbackRoute.js");
 const hostelRoute = require("./modules/hostel/hostelRoute.js");
 const qrRoute = require("./modules/qr/qrRoute.js");
 const messRoute = require("./modules/mess/messRoute.js");
+const adminRoute = require("./modules/admins/adminRoute.js");
 const {
   wednesdayScheduler,
   sundayScheduler,
@@ -71,6 +72,9 @@ app.get("/hello", (req, res) => {
 
 // item route
 app.use("/api/items", itemRoute);
+
+//admin route
+app.use("/api/admins", adminRoute);
 
 // user route
 app.use("/api/users", userRoute);
