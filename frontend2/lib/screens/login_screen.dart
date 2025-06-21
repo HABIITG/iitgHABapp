@@ -40,7 +40,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       backgroundColor: Colors.transparent, // Transparent background
       builder: (BuildContext context) {
         return FractionallySizedBox(
-          heightFactor: 0.4, // 40% of available height
+          heightFactor: 0.3, // 40% of available height
           child: Container(
             decoration: const BoxDecoration(
               color: Colors.white, // white to match figma UI
@@ -122,17 +122,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   ),
                    const SizedBox(height: 14,),
 
-                  const Text(
-                    'For Mess Officials',
-                    style: TextStyle(
-                      fontFamily: 'GeneralSans',
-                      fontWeight: FontWeight.w500,
-                      fontSize: 14,
-                      color: Color(0xFF676767),
-                    ),
-                  ),
-                   const SizedBox(height: 12,),
-                   GoogleSignInDialog(), //GOOGLE sign in implementation
+
                 ],
               ),
             ),
@@ -193,7 +183,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                 ),
                               ),
                               Text(
-                                'AppName',
+                                'HAB APP',
                                 style: TextStyle(
                                   fontSize: 32,
                                   fontWeight: FontWeight.bold,

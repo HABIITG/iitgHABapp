@@ -42,7 +42,7 @@ class _QrScanState extends State<QrScan> {
     super.dispose();
   }
 
-  Future<void> scanMess(String qrCode) async {
+  Future<void> scanMess(String messID) async {
     if (_isProcessing) return;
 
     setState(() {
@@ -61,14 +61,14 @@ class _QrScanState extends State<QrScan> {
       }
 
       // Hardcoded mess ID for now
-      const messId = "6826dfda8493bb0870b10cbf";
+      //const messId = "6826dfda8493bb0870b10cbf";
 
-      final url = "$baseUrl/mess/scan/$messId";
+      final url = "$baseUrl/mess/scan/$messID";
 
       final response = await dio.post(
         url,
         data: {
-          'qr_string': qrCode,
+          // 'qr_string': qrCode,
           'userId': userId,
         },
         options: Options(
@@ -78,6 +78,8 @@ class _QrScanState extends State<QrScan> {
           },
         ),
       );
+
+
 
       if (await Vibration.hasVibrator() ?? false) {
         Vibration.vibrate(duration: 100);

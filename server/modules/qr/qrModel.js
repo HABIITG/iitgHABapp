@@ -18,6 +18,10 @@ const qrSchema = new mongoose.Schema(
         scanned_at: {
             type: Date,
             default: null
+        },
+        qr_base64: {
+            type: String,
+            required: true
         }
     }
 );

@@ -65,8 +65,8 @@ class MessMenuCard extends StatelessWidget {
     return Card(
       color: Colors.white,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(24),
-        side: BorderSide(width: 1, color:Color(0xFFC5C5D1),)
+          borderRadius: BorderRadius.circular(24),
+          side: BorderSide(width: 1, color:Color(0xFFC5C5D1),)
 
       ),
       elevation: 0.5,

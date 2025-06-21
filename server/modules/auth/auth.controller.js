@@ -12,6 +12,7 @@ const appConfig = require("../../config/default.js");
 const clientid = process.env.CLIENT_ID;
 const clientSecret = process.env.CLIENT_SECRET;
 const redirect_uri = process.env.REDIRECT_URI;
+console.log("Redirect URI:", redirect_uri);
 
 // Not used
 const loginHandler = (req, res) => {

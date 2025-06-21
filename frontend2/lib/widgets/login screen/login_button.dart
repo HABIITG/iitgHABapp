@@ -11,7 +11,7 @@ class LoginButton extends StatelessWidget {
         children: [
           SvgPicture.asset('assets/fonts/microsoft.svg', height: 30),
           const SizedBox(
-            width: 20,
+            width: 0,
           ),
           const Text(
             'Sign in with Microsoft',

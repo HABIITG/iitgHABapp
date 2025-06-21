@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:frontend1/apis/mess/mess_menu.dart';
+
 import 'package:frontend1/constants/endpoint.dart';
 import 'package:frontend1/screens/profile_screen.dart';
 import 'package:frontend1/screens/qr_scanner.dart';
@@ -35,6 +35,7 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     fetchUserData();
     fetchMessIdAndToken();
+
   }
 
   Future<void> fetchUserData() async {
@@ -62,7 +63,9 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> fetchMessIdAndToken() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      currSubscribedMess = prefs.getString('curr_subscribed_mess') ?? '';
+      currSubscribedMess = prefs.getString('messID') ?? '';
+      print("mess id: ");
+      print(currSubscribedMess);
       token = prefs.getString('access_token');
     });
   }
@@ -226,7 +229,7 @@ class _HomeScreenState extends State<HomeScreen> {
             }
 
             final hostelData = messProvider.hostelMap[currSubscribedMess];
-            final messId = hostelData?.messid ?? '6826dfda8493bb0870b10cbf';
+            final messId = currSubscribedMess;
 
             return MenuFutureBuilder(
               messId: messId,
@@ -276,7 +279,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          padding: const EdgeInsets.symmetric(horizontal: 16.0,),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -305,7 +308,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   ],
                 ),
               ),
-
               const SizedBox(height: 8),
               const Text(
                 "No notifications need your attention",
@@ -315,7 +317,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
               const SizedBox(height: 24),
-              ComplaintsCard(feedbackform: feedbackform),
+              ComplaintsCard(feedbackform: feedbackform,),
               buildQuickActions(),
               buildMessTodayCard(),
               const SizedBox(height: 32),

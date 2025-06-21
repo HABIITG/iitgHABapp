@@ -8,7 +8,7 @@ const messSchema = new mongoose.Schema({
   hostelId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Hostel",
-    required: true,
+    //required: true,
   },
   complaints: [
     {
@@ -23,6 +23,11 @@ const messSchema = new mongoose.Schema({
   ranking: {
     type: Number,
     default: 0,
+  },
+
+  qrCode: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "QR",
   },
 });
 

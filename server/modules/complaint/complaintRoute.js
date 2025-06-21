@@ -1,17 +1,22 @@
-const express = require('express');
+const express = require("express");
 
 const complaintRouter = express.Router();
 
-const authenticateJWT = require('../../middleware/authenticateJWT');
+const { authenticateJWT } = require("../../middleware/authenticateJWT");
 
-const { submitComplaint, updateComplaint, getComplaint, deleteComplaint } = require('./complaintController');
+const {
+  submitComplaint,
+  updateComplaint,
+  getComplaint,
+  deleteComplaint,
+} = require("./complaintController");
 
-complaintRouter.post('/',authenticateJWT, submitComplaint);
+complaintRouter.post("/", authenticateJWT, submitComplaint);
 
-complaintRouter.put('/:id', authenticateJWT, updateComplaint);
+complaintRouter.put("/:id", authenticateJWT, updateComplaint);
 
-complaintRouter.get('/:id', authenticateJWT, getComplaint);
+complaintRouter.get("/:id", authenticateJWT, getComplaint);
 
-complaintRouter.delete('/:id', authenticateJWT, deleteComplaint);   
+complaintRouter.delete("/:id", authenticateJWT, deleteComplaint);
 
 module.exports = complaintRouter;

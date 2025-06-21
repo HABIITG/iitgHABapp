@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_web_auth_2/flutter_web_auth_2.dart';
+import 'package:frontend1/apis/mess/user_mess_info.dart';
 import 'package:frontend1/apis/protected.dart';
 import 'package:frontend1/apis/users/user.dart';
 import 'package:frontend1/constants/endpoint.dart';
@@ -27,6 +28,7 @@ Future<void> authenticate() async {
     }
     prefs.setString('access_token', accessToken);
     await fetchUserDetails();
+    await getUserMessInfo();
   } on PlatformException catch (_) {
     rethrow;
   } catch (e) {

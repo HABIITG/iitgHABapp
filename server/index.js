@@ -1,7 +1,6 @@
 // server/index.js
 //import authRoutes from "./modules/auth/auth.routes.js";
 const authRoutes = require("./modules/auth/auth.routes.js");
-
 const express = require("express");
 const mongoose = require("mongoose");
 const itemRoute = require("./modules/item/itemRoute.js");
@@ -12,6 +11,8 @@ const feedbackRoute = require("./modules/feedback/feedbackRoute.js");
 const hostelRoute = require("./modules/hostel/hostelRoute.js");
 const qrRoute = require("./modules/qr/qrRoute.js");
 const messRoute = require("./modules/mess/messRoute.js");
+const logsRoute = require("./modules/mess/ScanLogsRoute.js");
+// const cors = require("cors");
 const {
   wednesdayScheduler,
   sundayScheduler,
@@ -19,27 +20,32 @@ const {
 const {
   feedbackScheduler,
 } = require("./modules/feedback/feedbackScheduler.js");
+
+const {
+  feedbackResetScheduler,
+} = require("./modules/feedback/feedbackScheduler.js");
 require("dotenv").config();
 
 const app = express();
 const MONGOdb_uri = process.env.MONGODB_URI;
 const PORT = process.env.PORT || 3000;
-// Middleware for CORS
+
 // app.use(
 //   cors({
-//     origin: "http://localhost:3000",
-//     methods: ["GET", "POST", "PUT", "DELETE"],
+//     origin: "http://localhost:5173",
 //     credentials: true,
 //   })
 // );
 
-// console.log(PORT)
-// console.log(MONGOdb_uri)
-
 // Middleware
 app.use(express.json());
+// app.use(
+//   cors({
+//     origin: "http://localhost:5173", // your frontend port
+//     credentials: true, // allow cookies
+//   })
+// );
 app.use(cookieParser());
-
 app.use(express.urlencoded({ extended: true }));
 
 // MongoDB connection
@@ -53,6 +59,7 @@ mongoose
     sundayScheduler();
 
     feedbackScheduler();
+    feedbackResetScheduler();
   })
   .catch((err) => console.log(err));
 
@@ -91,6 +98,9 @@ app.use("/api/qr", qrRoute);
 
 //mess route
 app.use("/api/mess", messRoute);
+
+//scanlogs route
+app.use("/api/logs", logsRoute);
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

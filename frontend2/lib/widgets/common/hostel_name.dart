@@ -14,7 +14,7 @@ String calculateHostel(String objectID) {
       return "Kapili";
     case "67864679a827df8cd5d316b8":
       return "Gaurang";
-    case "67864686a827df8cd5d316ba":
+    case "6826de5181420e896eaf7025":// changed acc to new schema
       return "Brahmaputra";
     case "67864697a827df8cd5d316bc":
       return "Dihing";
