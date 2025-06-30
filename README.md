@@ -29,7 +29,10 @@ This app helps students to put a complaint about issues faced in hostel. It also
   <img src="./readme-assets/scanstatus3.png" width="24%" alt="Mockup 8"/>
 </div>
 
+
+
 ## NOTE: JUST ONE PART OF THE APP OTHER PART IN PROGRESS
+
 
 ---
 
