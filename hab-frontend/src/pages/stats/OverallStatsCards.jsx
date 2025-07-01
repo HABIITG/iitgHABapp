@@ -1,4 +1,4 @@
-import { BarChartOutlined, CalendarOutlined, TeamOutlined } from "@ant-design/icons";
+import { BarChartOutlined, CalendarOutlined, TeamOutlined, ExclamationCircleOutlined } from "@ant-design/icons";
 
 function OverallStatsCards({ stats }) {
 
@@ -48,6 +48,13 @@ function OverallStatsCards({ stats }) {
         </div>
 
       </section>
+    )
+  else
+    return (
+      <div className="flex flex-col items-center justify-center mt-30">
+        <ExclamationCircleOutlined className="!text-red-500 text-8xl mb-6"/>
+        <div className="font-semibold text-5xl text-gray-600">This Date has no Stats!</div>
+      </div>
     )
 }
 

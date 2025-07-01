@@ -4,7 +4,7 @@ const { ScanLogs } = require("./ScanLogsModel.js");
 const statsByDate = async (req, res) => {
   try {
     const date = req.params.date;
-    const messid = req.body.messid;
+    const messid = req.query.messId;
     let logs = {};
     if (!messid) {
       logs = await ScanLogs.find({ date: date });
@@ -43,7 +43,6 @@ const statsByDate = async (req, res) => {
         stats.highest[0] = key; stats.highest[1] = attendance
       }
       else if (attendance > stats.highest[1]){
-        console.log("hello?")
         stats.highest[0] = key;
         stats.highest[1] = attendance
       }
@@ -52,11 +51,12 @@ const statsByDate = async (req, res) => {
         stats.lowest[1] = attendance;
       }
     }
-
+console.log(stats)
     res.status(200).json(stats);
   }
   catch (error) {
     console.error(error);
+    console.log("hello")
     return res.status(500).json({ message: "Internal server error" });
   }
 }

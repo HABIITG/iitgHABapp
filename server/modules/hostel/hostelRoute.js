@@ -12,6 +12,7 @@ const {
   getHostelbyId,
   getAllHostels,
   applyMessChange,
+  getAllHostelsWithMess,
   getAllHostelNameAndCaterer
 } = require("./hostelController.js");
 
@@ -226,6 +227,8 @@ hostelRouter.get("/get", authenticateAdminJWT, getHostel);
  *                   example: "Error occurred"
  */
 hostelRouter.get("/all", getAllHostels);
+
+hostelRouter.get("/allhostel", getAllHostelsWithMess);
 
 hostelRouter.post("/change", authenticateJWT, applyMessChange);
 

@@ -54,6 +54,16 @@ const getAllHostels = async (req, res) => {
     return res.status(200).json(hostels);
   } catch (err) {
     console.log(err);
+    return res.status(500).json({ message: "Error occured" });
+  }
+};
+
+const getAllHostelsWithMess = async (req, res) => {
+  try {
+    const hostels = await Hostel.find().populate("messId");
+    return res.status(200).json(hostels);
+  } catch (err) {
+    console.log(err);
     return res.status(500).json({ message: "Error occurred" });
   }
 };
@@ -89,6 +99,8 @@ const deleteHostel = async (req, res) => {
     return res.status(500).json({ message: "Internal server error" });
   }
 };
+
+
 
 const applyMessChange = async (req, res) => {
   const { hostel_name, roll_number, reason } = req.body;
@@ -167,6 +179,7 @@ module.exports = {
   loginHostel,
   getHostel,
   getAllHostels,
+  getAllHostelsWithMess,
   getHostelbyId,
   deleteHostel,
   applyMessChange,
