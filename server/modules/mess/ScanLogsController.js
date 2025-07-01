@@ -43,7 +43,6 @@ const statsByDate = async (req, res) => {
         stats.highest[0] = key; stats.highest[1] = attendance
       }
       else if (attendance > stats.highest[1]){
-        console.log("hello?")
         stats.highest[0] = key;
         stats.highest[1] = attendance
       }

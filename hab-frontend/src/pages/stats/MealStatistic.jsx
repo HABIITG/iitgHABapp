@@ -6,7 +6,6 @@ import { Doughnut } from "react-chartjs-2";
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 function MealStatistic({ meal, stats, date }) {
-
   //Obtaining the timings for the particular meal
   const timings = {
     "breakfast": ["7:00AM - 9:30AM", "8:00AM - 10:15AM"],
@@ -23,9 +22,9 @@ function MealStatistic({ meal, stats, date }) {
   const attendance = ((stats[currmeal] / stats.total) * 100).toFixed(1).toString() + "%";
 
   //Obtaining rank of meal
-  let rank = 0;
+  let rank = 1;
   for (const key in stats)
-    if (stats[key] > stats[currmeal]) ++rank;
+    if (stats[key] > stats[currmeal] && key != "total") ++rank;
 
   //Colors based on the rank
   const colormap = {
