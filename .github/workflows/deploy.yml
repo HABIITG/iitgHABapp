@@ -1,0 +1,39 @@
+name: Deploy HAB Backend Server
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Copy project files to EC2
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_KEY }}
+          source: "."
+          target: "/home/ubuntu/iitgHABapp"
+
+      - name: SSH into EC2 and restart server
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_KEY }}
+          script: |
+            cd iitgHABapp/server
+            npm install
+            rm .env
+            cat <<EOF > .env
+            ${{ secrets.EC2_ENV }}
+            EOF
+            pm2 restart server || pm2 start index.js --name server

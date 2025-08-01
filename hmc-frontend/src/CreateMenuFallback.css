@@ -1,0 +1,228 @@
+/* CreateMenuFallback.css */
+
+.create-menu-fallback {
+  max-width: 500px;
+  margin: 2rem auto;
+  padding: 2rem;
+  border: 2px dashed #e0e0e0;
+  border-radius: 12px;
+  background-color: #fafafa;
+  text-align: center;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.create-menu-fallback.success {
+  border-color: #4caf50;
+  background-color: #f1f8e9;
+}
+
+.fallback-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.fallback-header h3 {
+  margin: 0 0 0.5rem 0;
+  color: #333;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.fallback-header p {
+  margin: 0;
+  color: #666;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+/* Loading State */
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #e0e0e0;
+  border-top: 4px solid #2196f3;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-state p {
+  margin: 0;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+/* Success State */
+.success-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.success-icon {
+  width: 60px;
+  height: 60px;
+  background-color: #4caf50;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  font-weight: bold;
+}
+
+.success-content h3 {
+  margin: 0;
+  color: #2e7d32;
+  font-size: 1.5rem;
+}
+
+.success-content p {
+  margin: 0;
+  color: #4caf50;
+  font-size: 1rem;
+}
+
+/* Error State */
+.error-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background-color: #ffebee;
+  border-radius: 8px;
+  border: 1px solid #ffcdd2;
+}
+
+.error-icon {
+  font-size: 2rem;
+}
+
+.error-message {
+  margin: 0;
+  color: #c62828;
+  font-size: 0.9rem;
+  text-align: center;
+  line-height: 1.4;
+}
+
+.retry-button {
+  background-color: #f44336;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.2s ease;
+}
+
+.retry-button:hover:not(:disabled) {
+  background-color: #d32f2f;
+}
+
+.retry-button:disabled {
+  background-color: #ffcdd2;
+  cursor: not-allowed;
+}
+
+/* Manual Create */
+.manual-create {
+  padding: 1rem;
+}
+
+.create-button {
+  background-color: #2196f3;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: background-color 0.2s ease;
+}
+
+.create-button:hover:not(:disabled) {
+  background-color: #1976d2;
+}
+
+.create-button:disabled {
+  background-color: #bbdefb;
+  cursor: not-allowed;
+}
+
+/* Menu Details */
+.menu-details {
+  background-color: white;
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+  text-align: left;
+}
+
+.menu-details h4 {
+  margin: 0 0 0.5rem 0;
+  color: #333;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.menu-details ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.menu-details li {
+  padding: 0.25rem 0;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.menu-details li strong {
+  color: #333;
+  font-weight: 500;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .create-menu-fallback {
+    margin: 1rem;
+    padding: 1.5rem;
+  }
+  
+  .fallback-header h3 {
+    font-size: 1.3rem;
+  }
+  
+  .fallback-header p {
+    font-size: 0.9rem;
+  }
+  
+  .success-icon {
+    width: 50px;
+    height: 50px;
+    font-size: 1.5rem;
+  }
+  
+  .success-content h3 {
+    font-size: 1.3rem;
+  }
+}
