@@ -16,12 +16,6 @@ class MainNavigationScreen extends StatefulWidget {
 class _MainNavigationScreenState extends State<MainNavigationScreen> {
   int _selectedIndex = 0;
 
-  final List<Widget> _screens = const [
-    HomeScreen(),
-    MessScreen(),
-    ComingSoonScreen(), // for now only
-  ];
-
   void _handleNavTap(int index) {
     setState(() {
       _selectedIndex = index;
@@ -30,8 +24,16 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final screens = [
+      HomeScreen(onNavigateToTab: _handleNavTap),
+      MessScreen(),
+      ComingSoonScreen(),
+    ];
     return Scaffold(
-      body: _screens[_selectedIndex],
+      body: IndexedStack(
+        index: _selectedIndex,
+        children: screens,
+      ),
       bottomNavigationBar: BottomNavBar(
         currentIndex: _selectedIndex,
         onTap: _handleNavTap,

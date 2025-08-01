@@ -18,7 +18,8 @@ import '../utilities/startupitem.dart';
 import '../widgets/complaint_dropdown.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  final void Function(int)? onNavigateToTab;
+  const HomeScreen({super.key, this.onNavigateToTab});
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
@@ -185,25 +186,28 @@ class _HomeScreenState extends State<HomeScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 2),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 2),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Text(
+              const Text(
                 "In Mess Today",
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 16,
                 ),
               ),
-              Text(
-                "Go to Mess",
-                style: TextStyle(
-                  color: Color(0xFF3754DB),
-                  fontWeight: FontWeight.w600,
-                  fontSize: 14,
+              GestureDetector(
+                onTap: () => widget.onNavigateToTab?.call(1),
+                child: const Text(
+                  "Go to Mess",
+                  style: TextStyle(
+                    color: Color(0xFF3754DB),
+                    fontWeight: FontWeight.w600,
+                    fontSize: 14,
+                  ),
                 ),
               ),
             ],
