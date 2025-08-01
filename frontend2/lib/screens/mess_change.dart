@@ -188,7 +188,9 @@ class _MessChangeReqState extends State<MessChangeReq> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Mess Change'),
+        title: Text('Mess Preference',style: TextStyle(
+          fontWeight: FontWeight.w700,
+        ),),
       ),
       backgroundColor: Colors.white,
       body: Padding(
@@ -197,10 +199,10 @@ class _MessChangeReqState extends State<MessChangeReq> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             SizedBox(height: 20),
-            Text('Select the name of mess you want to change to :'),
+            Text('Choose the mess that suits your taste or convenience'),
             SizedBox(height: 10),
             DropdownButton<String>(
-              hint: Text('Select mess'),
+              hint: Text('First Preference'),
               value: selectedValue,
               icon: Icon(Icons.keyboard_arrow_down),
               elevation: 16,
