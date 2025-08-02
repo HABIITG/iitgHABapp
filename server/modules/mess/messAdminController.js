@@ -60,7 +60,7 @@ const modifyMenuItem = async (req, res) => {
       return res.status(404).json({ message: "Menu item not found" });
     }
     menuItem.name = name || menuItem.name;
-    
+  
     await menuItem.save();
 
     return res
