@@ -21,7 +21,7 @@ const getMessMenuByDayForAdmin = async (req, res) => {
     const allMenus = await Menu.find({});
     const menu = await Menu.find({messId:messId,day:day}); //FIX THIS! PUT MESS ID AS WELL
     if (!menu || menu.length === 0) {
-      return res.status(200).json("DoesntExist");
+      return res.status(200).json("Doesn't Exist");
     }
 
     const populatedMenus = [];
@@ -72,7 +72,37 @@ const modifyMenuItem = async (req, res) => {
   }
 };
 
+const removeMenuItem = async (req, res) =>{
+    try {
+        const _Id = req.body._Id;
+        try {
+        await MenuItem.findByIdAndDelete(_Id);
+        } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: "Menu item not found"})};
+    } catch (error) {
+         console.error(error);
+         return res.status(500).json({ message: "Internal server error" });
+       }
+}
+
+const addMenuItem = async (req, res)=>{
+    try{
+        MenuItem.insertOne({
+        menuId:req.body.menuId,
+        name:req.body.name,
+        type:req.body.type,
+        });
+    } catch (error) {
+              console.error(error);
+              return res.status(500).json({ message: "Internal server error" });
+            }
+}
+
+
 module.exports = {
-  modifyMenuItem, //to modify menu item
-  getMessMenuByDayForAdmin
+  modifyMenuItem, //to modify menu item's name when typo occurs
+  getMessMenuByDayForAdmin,
+  removeMenuItem,//remove a menu item
+  addMenuItem,//add a menu item
 };
