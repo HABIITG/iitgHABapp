@@ -2,27 +2,40 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { useAuth } from "../context/AuthProvider";
 //import { useAuth } from "../context/AuthContext";
+import { API_BASE_URL } from "../apis"; // Assuming you have a common API base URL defined
 
 export function LoginPage() {
   const { login } = useAuth();
   const [password, setPassword] = useState("");
   const [hostels, setHostels] = useState([]);
   const [selectedHostel, setSelectedHostel] = useState("");
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     async function fetchHostels() {
       try {
+        setLoading(true);
         await axios
-          .get("http://localhost:8000/api/hostel/all", {
-            withCredentials: true,
+          .get(`${API_BASE_URL}/hostel/all`, {
+      
           })
           .then((res) => setHostels(res.data));
+        setLoading(false);
       } catch (error) {
         console.error("Error fetching hostels:", error);
+        setLoading(false);
       }
     }
     fetchHostels();
   }, []);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-lg font-semibold">Loading...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4">

@@ -85,7 +85,7 @@ This app helps students to put a complaint about issues faced in hostel. It also
    # Azure AD, can be obtained from Azure portal
    CLIENT_ID="your_azure_app_id"
    CLIENT_SECRET="your_azure_secret"
-   REDIRECT_URI="http://localhost:3000/auth/callback"
+   REDIRECT_URI="https://hab.codingclub.in/auth/callback"
 
    # JWT
    JWT_SECRET="your_secure_random_string"

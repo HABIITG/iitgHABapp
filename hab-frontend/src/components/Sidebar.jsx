@@ -39,17 +39,11 @@ const Sidebar = () => {
       icon: <UserOutlined />,
     },
     {
-      key: "5",
-      name: "Overall Statistics",
-      path: "/overallstats",
-      icon: <BarChartOutlined />,
-    },
-    {
       key: "6",
       name: "Hostel Statistics",
       path: "/hostelstats",
-      icon: <BarChartOutlined />
-    }
+      icon: <BarChartOutlined />,
+    },
   ];
 
   useEffect(() => {

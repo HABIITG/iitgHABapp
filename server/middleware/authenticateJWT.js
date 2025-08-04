@@ -30,6 +30,8 @@ function auth(Schema, param) {
       const found = await Schema.findByJWT(token);
       if (!found) return next(new AppError(403, "Not Authenticated"));
 
+      console.log(found);
+
       // Attach the param to the request object
       req[param] = found;
       return next();

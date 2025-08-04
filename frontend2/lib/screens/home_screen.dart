@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 
 import 'package:frontend1/constants/endpoint.dart';
+import 'package:frontend1/screens/mess_change.dart';
+import 'package:frontend1/screens/mess_change_screen.dart';
 import 'package:frontend1/screens/profile_screen.dart';
 import 'package:frontend1/screens/qr_scanner.dart';
 import 'package:frontend1/utilities/ComingSoon.dart';
@@ -18,7 +20,8 @@ import '../utilities/startupitem.dart';
 import '../widgets/complaint_dropdown.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  final void Function(int)? onNavigateToTab;
+  const HomeScreen({super.key, this.onNavigateToTab});
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
@@ -111,24 +114,35 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Container(
                 height: 90,
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF6F6F6),
+                  // color: const Color(0xFFF6F6F6),
+                  color: const Color(0xFFFFFFFF),
                   borderRadius: BorderRadius.circular(18),
                 ),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    SvgPicture.asset(
-                      'assets/icon/complaint.svg',
-                      width: 32,
-                      height: 32,
-                      color: const Color(0xFF3754DB),
+                    Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF3754DB),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Center(
+                        child: SvgPicture.asset(
+                          'assets/icon/complaint.svg',
+                          color: Colors.white,
+                          width: 22,
+                          height: 22,
+                        ),
+                      ),
                     ),
                     const SizedBox(height: 8),
                     const Text(
                       "New Complaint",
                       style: TextStyle(
                         color: Colors.black,
-                        fontWeight: FontWeight.w500,
+                        fontWeight: FontWeight.w600,
                         fontSize: 15,
                       ),
                     ),
@@ -150,24 +164,86 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Container(
                 height: 90,
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF6F6F6),
+                  // color: const Color(0xFFF6F6F6),
+                  color: const Color(0xFFFFFFFF),
                   borderRadius: BorderRadius.circular(18),
                 ),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    SvgPicture.asset(
-                      'assets/icon/qrscan.svg',
-                      width: 32,
-                      height: 32,
-                      color: const Color(0xFF3754DB),
+                    Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF3754DB),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Center(
+                        child: SvgPicture.asset(
+                          'assets/icon/qrscan.svg',
+                          color: Colors.white,
+                          width: 22,
+                          height: 22,
+                        ),
+                      ),
                     ),
                     const SizedBox(height: 8),
                     const Text(
                       "Scan Mess QR",
                       style: TextStyle(
                         color: Colors.black,
-                        fontWeight: FontWeight.w500,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 15,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: InkWell(
+              borderRadius: BorderRadius.circular(18),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  // MaterialPageRoute(builder: (context) => MessChangeScreen()),
+                  MaterialPageRoute(builder: (context) => MessChangeReq()),
+                );
+              },
+              child: Container(
+                height: 90,
+                decoration: BoxDecoration(
+                  // color: const Color(0xFFF6F6F6),
+                  color: const Color(0xFFFFFFFF),
+                  borderRadius: BorderRadius.circular(18),
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF3754DB),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Center(
+                        child: SvgPicture.asset(
+                          'assets/icon/messicon.svg',
+                          color: Colors.white,
+                          width: 22,
+                          height: 22,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    const Text(
+                      "Mess Change",
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontWeight: FontWeight.w600,
                         fontSize: 15,
                       ),
                     ),
@@ -185,25 +261,28 @@ class _HomeScreenState extends State<HomeScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 2),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 2),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Text(
+              const Text(
                 "In Mess Today",
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 16,
                 ),
               ),
-              Text(
-                "Go to Mess",
-                style: TextStyle(
-                  color: Color(0xFF3754DB),
-                  fontWeight: FontWeight.w600,
-                  fontSize: 14,
+              GestureDetector(
+                onTap: () => widget.onNavigateToTab?.call(1),
+                child: const Text(
+                  "Go to Mess",
+                  style: TextStyle(
+                    color: Color(0xFF3754DB),
+                    fontWeight: FontWeight.w600,
+                    fontSize: 14,
+                  ),
                 ),
               ),
             ],

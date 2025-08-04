@@ -1,16 +1,16 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function HostelForm() {
   const server = import.meta.env.VITE_SERVER_URL;
   const navigate = useNavigate();
 
-  const [hostelName, setHostelName] = useState('');
-  const [capacity, setCapacity] = useState('');
-  const [messId, setMessId] = useState('');
+  const [hostelName, setHostelName] = useState("");
+  const [capacity, setCapacity] = useState("");
+  const [messId, setMessId] = useState("");
   const [unassignedMess, setUnassignedMess] = useState([]);
   const [error, setError] = useState(null);
-    const [password, setPassword] = useState('');
+  const [password, setPassword] = useState("");
 
   const uploadHandle = async (e) => {
     e.preventDefault();
@@ -19,46 +19,43 @@ export default function HostelForm() {
     const hostelData = {
       hostel_name: hostelName,
       current_cap: Number(capacity),
-      messId,
-      password
+      password,
     };
 
     try {
       const response = await fetch(`${server}/api/hostel/`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(hostelData),
       });
 
-      if (!response.ok) throw new Error('Failed to create hostel');
+      if (!response.ok) throw new Error("Failed to create hostel");
 
-      navigate('/hostels');
+      navigate("/hostels");
     } catch (err) {
-      console.error('Upload error:', err);
-      setError('Something went wrong while uploading.');
+      console.error("Upload error:", err);
+      setError("Something went wrong while uploading.");
     }
   };
 
   useEffect(() => {
     const fetchUnassignedMess = async () => {
       try {
-        const response = await fetch(`${server}/api/mess/unassigned`,
-          {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-          }
-        );
+        const response = await fetch(`${server}/api/mess/unassigned`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
         const data = await response.json();
         setUnassignedMess(data);
 
-        setMessId(data.length > 0 ? data[0]._id : '');
+        setMessId(data.length > 0 ? data[0]._id : "");
       } catch (error) {
-        console.error('Failed to fetch unassigned mess:', error);
-        setError('Failed to load mess caterers.');
+        console.error("Failed to fetch unassigned mess:", error);
+        setError("Failed to load mess caterers.");
       }
     };
 
@@ -76,7 +73,9 @@ export default function HostelForm() {
         {error && <p className="text-red-500 text-sm">{error}</p>}
 
         <div>
-          <label className="block text-gray-700 font-medium mb-1">Hostel Name</label>
+          <label className="block text-gray-700 font-medium mb-1">
+            Hostel Name
+          </label>
           <input
             type="text"
             value={hostelName}
@@ -87,7 +86,9 @@ export default function HostelForm() {
         </div>
 
         <div>
-          <label className="block text-gray-700 font-medium mb-1">Capacity</label>
+          <label className="block text-gray-700 font-medium mb-1">
+            Capacity
+          </label>
           <input
             type="number"
             value={capacity}
@@ -98,11 +99,12 @@ export default function HostelForm() {
         </div>
 
         <div>
-          <label className="block text-gray-700 font-medium mb-1">Mess Caterer</label>
+          <label className="block text-gray-700 font-medium mb-1">
+            Mess Caterer
+          </label>
           <select
             value={messId}
             onChange={(e) => setMessId(e.target.value)}
-            required
             className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             {unassignedMess.map((mess) => (
@@ -113,7 +115,9 @@ export default function HostelForm() {
           </select>
         </div>
         <div>
-          <label className="block text-gray-700 font-medium mb-1">Create Password</label>
+          <label className="block text-gray-700 font-medium mb-1">
+            Create Password
+          </label>
           <input
             type="password"
             value={password}

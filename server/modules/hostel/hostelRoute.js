@@ -182,7 +182,7 @@ hostelRouter.delete("/delete/:hostelId",deleteHostel);
  */
 hostelRouter.get("/all/:hostelId",getHostelbyId);
 
-hostelRouter.post("/login", authenticateAdminJWT, loginHostel);
+hostelRouter.post("/login", loginHostel);
 
 hostelRouter.get("/get", authenticateAdminJWT, getHostel);
 

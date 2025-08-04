@@ -4,7 +4,7 @@ import { Dashboard } from "./pages/Dashboard.jsx"; // Create this page
 import ProtectedRoute from "./components/ProtectedRoute";
 function App() {
   return (
-    <div className="h-screen w-screen flex justify-center items-center bg-gray-200">
+    <div className=" w-screen flex justify-center items-center bg-gray-200">
       <Routes>
         <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="/login" element={<LoginPage />} />

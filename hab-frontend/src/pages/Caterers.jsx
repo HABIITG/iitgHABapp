@@ -10,7 +10,7 @@ export default function Caterers() {
   useEffect(() => {
     const fetchMesses = async () => {
       try {
-        const res = await axios.post("http://localhost:8000/api/mess/all");
+        const res = await axios.post("https://hab.codingclub.in/api/mess/all");
         setMesses(res.data);
       } catch (error) {
         console.error("Error fetching messes:", error);

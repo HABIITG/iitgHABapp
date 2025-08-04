@@ -13,7 +13,7 @@ export default function MessDetails() {
   useEffect(() => {
     async function fetchMess() {
       try {
-        const res = await axios.get(`http://localhost:8000/api/mess/${id}`);
+        const res = await axios.get(`https://hab.codingclub.in/api/mess/${id}`);
         setMess(res.data);
       } catch (error) {
         console.error("Error fetching mess:", error);
@@ -26,7 +26,7 @@ export default function MessDetails() {
   useEffect(() => {
     async function fetchHostels() {
       try {
-        const res = await axios.get("http://localhost:8000/api/hostel/all");
+        const res = await axios.get("https://hab.codingclub.in/api/hostel/all");
         const hostels = res.data;
         setHostels(hostels.filter((hostel) => hostel.messId === null));
       } catch (error) {
@@ -39,7 +39,7 @@ export default function MessDetails() {
   const handleDelete = async () => {
     try {
       const res = await axios.delete(
-        `http://localhost:8000/api/mess/delete/${id}`
+        `https://hab.codingclub.in/api/mess/delete/${id}`
       );
       if (res.status === 200) {
         alert("Mess deleted successfully");
@@ -57,7 +57,7 @@ export default function MessDetails() {
       try {
         console.log(hostelId);
         const res = await axios.post(
-          `http://localhost:8000/api/mess/reassign/${id}`,
+          `https://hab.codingclub.in/api/mess/reassign/${id}`,
           {
             hostelId: hostelId,
           }
@@ -73,7 +73,7 @@ export default function MessDetails() {
     } else {
       try {
         const res = await axios.post(
-          `http://localhost:8000/api/mess/change-hostel/${id}`,
+          `https://hab.codingclub.in/api/mess/change-hostel/${id}`,
           {
             hostelId: hostelId,
             oldHostelId: mess.hostelId,

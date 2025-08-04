@@ -113,7 +113,8 @@ class _MyAppState extends State<MyApp> {
       debugShowCheckedModeBanner: false,
       navigatorKey: navigatorKey,
 
-      home: widget.isLoggedIn ? MainNavigationScreen() : LoginScreen(),
+      // home: widget.isLoggedIn ? MainNavigationScreen() : LoginScreen(),
+      home: MainNavigationScreen(),
 
       //home:  ProfileScreen(),
       builder: EasyLoading.init(),

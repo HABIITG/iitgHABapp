@@ -10,7 +10,7 @@ export default function MessMenu() {
     async function fetchMessMenu() {
       try {
         const res = await axios.post(
-          `http://localhost:8000/api/mess/hab-menu/${id}`,
+          `https://hab.codingclub.in/api/mess/hab-menu/${id}`,
           { day: "Monday" }
         );
         setMenu(res.data);

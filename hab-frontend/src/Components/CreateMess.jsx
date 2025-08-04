@@ -12,7 +12,7 @@ export default function CreateMess() {
   useEffect(() => {
     async function fetchHostels() {
       try {
-        const res = await axios.get("http://localhost:8000/api/hostel/all");
+        const res = await axios.get("https://hab.codingclub.in/api/hostel/all");
         const hostels = res.data;
         setHostels(hostels.filter((hostel) => hostel.messId === null));
       } catch (error) {
@@ -27,7 +27,7 @@ export default function CreateMess() {
     if (!hostelId || hostelId.length === 0) {
       try {
         const res = await axios.post(
-          "http://localhost:8000/api/mess/create-without-hostel",
+          "https://hab.codingclub.in/api/mess/create-without-hostel",
           {
             name: caterer,
           }
@@ -42,7 +42,7 @@ export default function CreateMess() {
       }
     } else {
       try {
-        await axios.post("http://localhost:8000/api/mess/create", {
+        await axios.post("https://hab.codingclub.in/api/mess/create", {
           name: caterer,
           hostelId: hostelId,
         });

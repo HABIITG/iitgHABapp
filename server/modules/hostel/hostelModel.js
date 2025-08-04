@@ -137,7 +137,7 @@ hostelSchema.statics.findByJWT = async function (token) {
     let hostel = this;
     var decoded = jwt.verify(token, adminjwtsecret);
     const id = decoded.hostel;
-    const fetchedHostel = await hostel.findOne({ _id: id });
+    const fetchedHostel = await hostel.findOne({ _id: id }).populate("messId");
     if (!fetchedHostel) return false;
     return fetchedHostel;
   } catch (error) {
