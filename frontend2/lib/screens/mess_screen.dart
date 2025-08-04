@@ -8,6 +8,7 @@ import 'package:frontend1/screens/mess_feedback/mess_feedback_page.dart';
 import 'package:frontend1/widgets/mess_widgets/MessMenuBuilder.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'mess_preference.dart';
 
 import '../apis/mess/mess_menu.dart';
 import '../models/mess_menu_model.dart';
@@ -504,7 +505,9 @@ class _MessInfo extends StatelessWidget {
               ),
             ],
           ),
-        ],
+          ElevatedButton(onPressed: () {
+            Navigator.push(context, MaterialPageRoute(builder: (context) =>  MessChangePreferenceScreen(),));
+          }, child: const Text('Mess Preferences'))],
       ),
     );
   }
