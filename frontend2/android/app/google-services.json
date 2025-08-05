@@ -1,44 +1,26 @@
 {
   "project_info": {
-    "project_number": "797839389983",
-    "project_id": "iitgcomplaint",
-    "storage_bucket": "iitgcomplaint.firebasestorage.app"
+    "project_number": "291063708231",
+    "project_id": "habapp-5d4c1",
+    "storage_bucket": "habapp-5d4c1.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:797839389983:android:2c5355e7789238c1626c2a",
+        "mobilesdk_app_id": "1:291063708231:android:e350e5c95c103ba1644f62",
         "android_client_info": {
           "package_name": "com.example.frontend1"
         }
       },
-      "oauth_client": [
-        {
-          "client_id": "797839389983-es19kusljptse85gqbj3isiqmibl6esg.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.example.frontend1",
-            "certificate_hash": "89867ab439e753aa89601d438d8dac457e828f4e"
-          }
-        },
-        {
-          "client_id": "797839389983-ne3kpv21cdcp6i1dne72pnqjcrhhjn48.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
+      "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyDGE5vccfIOPAjsb7dem3U6MAtdFXu7gJs"
+          "current_key": "AIzaSyBLoT9IAA0tKVusJV2yVZK8SkhX4u-3cEc"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "797839389983-ne3kpv21cdcp6i1dne72pnqjcrhhjn48.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
+          "other_platform_oauth_client": []
         }
       }
     }
