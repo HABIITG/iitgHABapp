@@ -109,6 +109,7 @@ class _MyAppState extends State<MyApp> {
         systemNavigationBarColor: Colors.black,
       ),
     );
+
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       navigatorKey: navigatorKey,
