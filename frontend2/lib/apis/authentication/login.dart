@@ -7,7 +7,7 @@ import 'package:frontend1/apis/users/user.dart';
 import 'package:frontend1/constants/endpoint.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
-
+import 'package:frontend1/utilities/notification.dart';
 import '../../screens/login_screen.dart';
 
 Future<void> authenticate() async {
@@ -26,9 +26,11 @@ Future<void> authenticate() async {
     if (accessToken == null) {
       throw ('access token not found');
     }
+
     prefs.setString('access_token', accessToken);
     await fetchUserDetails();
     await getUserMessInfo();
+    await registerFcmToken();
   } on PlatformException catch (_) {
     rethrow;
   } catch (e) {

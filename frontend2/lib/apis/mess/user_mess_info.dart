@@ -6,9 +6,6 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 
-
-
-
 Future<void> getUserMessInfo() async {
   try {
     print('API calling getusermessinfo');
@@ -25,18 +22,19 @@ Future<void> getUserMessInfo() async {
       ),
     );
     print("response");
-  print(response);
+    print(response);
     if (response.statusCode == 200) {
       final prefs = await SharedPreferences.getInstance();
 
-      final Map<String, dynamic> userData = response.data as Map<String, dynamic>;
+      final Map<String, dynamic> userData =
+          response.data as Map<String, dynamic>;
       print('user mess info is $userData');
       final String messID = userData['_id'] ?? "Not found";
       final String messName = userData['name'] ?? "Not found";
       final String hostelID = userData['hostelId'] ?? "Not found";
       //Leaving complaints for now,
       final int rating = userData['rating'] ?? "Not found";
-      final int ranking = userData['ranking']?? "Not found";
+      final int ranking = userData['ranking'] ?? "Not found";
 
       prefs.setString('messID', messID);
       prefs.setString('messName', messName);

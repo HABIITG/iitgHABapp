@@ -1,5 +1,8 @@
 const String baseUrl = "https://hab.codingclub.in/api";
 
+class NotificationEndpoints {
+  static const String registerToken = '$baseUrl/notification/register-token';
+}
 
 class UserEndpoints {
   static const String currentUser = '$baseUrl/users/';
@@ -32,27 +35,20 @@ class Userendpoints {
   static const getdetails = 'https://graph.microsoft.com/v1.0/me';
 }
 
-
 class tokenlink {
   static const Tokenlink =
       'https://login.microsoftonline.com/850aa78d-94e1-4bc6-9cf3-8c11b530701c/oauth2/v2.0/token';
 }
 
 class redirecturi {
-  static const Redirecturi =
-      '${baseUrl}/auth/login/redirect/mobile';
+  static const Redirecturi = '${baseUrl}/auth/login/redirect/mobile';
 }
 
-
-
 class messFeedback {
-  static const feedbackSubmit =
-      "$baseUrl/feedback/submit";
+  static const feedbackSubmit = "$baseUrl/feedback/submit";
 }
 
 class messInfo {
   static const getMessInfo = "$baseUrl/mess/all";
-  static const getUserMessInfo ="$baseUrl/mess/get";
+  static const getUserMessInfo = "$baseUrl/mess/get";
 }
-
-

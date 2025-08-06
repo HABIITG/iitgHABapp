@@ -17,11 +17,15 @@ import 'package:provider/provider.dart';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:frontend1/screens/profile_screen.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:frontend1/utilities/notification.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await Firebase.initializeApp();
+  await FirebaseMessaging.instance.requestPermission();
 
   // Your existing logic
   final bool asLoggedIn = await isLoggedIn();
@@ -57,6 +61,40 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
+
+    // Firebase Messaging setup
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
+      print('📩 Foreground Notification');
+      String? title = message.notification?.title ?? 'No Title';
+      String? body = message.notification?.body ?? 'No Body';
+
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      List<String> storedNotifications =
+          prefs.getStringList('notifications') ?? [];
+
+      storedNotifications.add('$title: $body');
+      await prefs.setStringList('notifications', storedNotifications);
+    });
+
+    // App opened via notification (terminated)
+    FirebaseMessaging.instance.getInitialMessage().then((message) {
+      if (message != null) {
+        print('🔁 App opened from terminated via notification');
+      }
+    });
+
+    // App opened via notification (background)
+    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+      print('🔁 App opened from background via notification');
+    });
+
+    print('Access token: 😊😊😊😊😊😊😊😊😊😊😊😊😊😊😊😊😊😊😊😊😊');
+
+    FirebaseMessaging.instance.getToken().then((token) {
+      print('FCM Token: $token');
+    }).catchError((error) {
+      print('Error getting FCM token: $error');
+    });
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       // This ensures it runs after the first frame

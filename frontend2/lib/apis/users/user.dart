@@ -13,6 +13,8 @@ Future<Map<String, String>?> fetchUserDetails() async {
     throw ('token not found');
   }
   try {
+    print(
+        "Fetching user details... ${UserEndpoints.currentUser}, 😂😂😂😂😂😂😂😂😂😂😂😂😂😂");
     final resp = await http.get(
       Uri.parse(UserEndpoints.currentUser),
       headers: {
