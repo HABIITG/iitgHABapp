@@ -16,6 +16,7 @@ import '../utilities/startupitem.dart';
 import '../widgets/feedback/FeedBackCard.dart';
 import '../widgets/mess_widgets/horizontal_menu_builder.dart';
 import '../widgets/mess_widgets/messmenu.dart';
+import 'package:intl/intl.dart';
 
 class MessApp extends StatefulWidget {
   const MessApp({super.key});
@@ -121,19 +122,12 @@ class _MessScreenState extends State<MessScreen> {
     );
   }
 }
-
 class _MenuSection extends StatefulWidget {
   @override
   State<_MenuSection> createState() => _MenuSectionState();
 }
 
-String copyMessID = '';
-
-String selectedDay = 'Monday';//also default this to todayday
-
 class _MenuSectionState extends State<_MenuSection> {
-
-
   final List<String> daysOnly = [
     'Monday',
     'Tuesday',
@@ -144,50 +138,70 @@ class _MenuSectionState extends State<_MenuSection> {
     'Sunday',
   ];
 
-  String messidcopy = '';
+  late String messId;
+  late String selectedDay;
+
+  @override
+  void initState() {
+    super.initState();
+    selectedDay = DateFormat('EEEE').format(DateTime.now()); // default to today
+    // default messId from provider
+    final hostelMap = Provider.of<MessInfoProvider>(context, listen: false).hostelMap;
+    messId = hostelMap.values.isNotEmpty
+        ? hostelMap.values.first.messid
+        : '6826dfda8493bb0870b10cbf';
+  }
+
+  void _updateMessId(String hostelName) {
+    final hostelMap = Provider.of<MessInfoProvider>(context, listen: false).hostelMap;
+    final id = hostelMap[hostelName]?.messid ?? '6826dfda8493bb0870b10cbf';
+    setState(() {
+      messId = id;
+    });
+  }
+
+  void _updateDay(String day) {
+    setState(() {
+      selectedDay = day;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              const Text("What’s in Menu",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-              const Spacer(),
-              HostelDrop(onChanged: (value) {
-                final hostelMap = Provider.of<MessInfoProvider>(context, listen: false).hostelMap;
-                final MessID = hostelMap[value]?.messid ?? '6826dfda8493bb0870b10cbf';
-                copyMessID = MessID;
-                print("Mess ID for $value : $MessID");
-              }),
-            ],
-          ),
-          const SizedBox(height: 16),
-          SizedBox(
-            height: 40,
-            child: ListView(
-              scrollDirection: Axis.horizontal,
-              children: daysOnly.map((day) {
-                return _DayChip(
-                  label: day,
-                  selected: selectedDay == day,
-                  onTap: () {
-                    setState(() {
-                      selectedDay = day;
-                    });
-                  },
-                );
-              }).toList(),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            const Text(
+              "What’s in Menu",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
+            const Spacer(),
+            HostelDrop(onChanged: _updateMessId),
+          ],
+        ),
+        const SizedBox(height: 16),
+        SizedBox(
+          height: 40,
+          child: ListView(
+            scrollDirection: Axis.horizontal,
+            children: daysOnly.map((day) {
+              return _DayChip(
+                label: day,
+                selected: selectedDay == day,
+                onTap: () => _updateDay(day),
+              );
+            }).toList(),
           ),
-          const SizedBox(height: 16),
-          _MenuCard(),
-          const SizedBox(height: 10),
-        ],
-      ),
+        ),
+        const SizedBox(height: 16),
+        _MenuCard(
+          messId: messId,
+          day: selectedDay,
+        ),
+        const SizedBox(height: 10),
+      ],
     );
   }
 }
@@ -226,119 +240,64 @@ class _DayChip extends StatelessWidget {
   }
 }
 
-class _MenuCard extends StatefulWidget {
+class _MenuCard extends StatelessWidget {
+  final String messId;
+  final String day;
+
+  const _MenuCard({required this.messId, required this.day});
+
   @override
-  State<_MenuCard> createState() => _MenuCardState();
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        _MealWrapper(meal: 'Breakfast', messId: messId, day: day),
+        _MealWrapper(meal: 'Lunch', messId: messId, day: day),
+        _MealWrapper(meal: 'Dinner', messId: messId, day: day),
+      ],
+    );
+  }
 }
 
-class _MenuCardState extends State<_MenuCard> {
-  int? _openDropdownIndex;
+class _MealWrapper extends StatelessWidget {
+  final String meal;
+  final String messId;
+  final String day;
 
-  @override
-  void initState() {
-    super.initState();
-    _openDropdownIndex = 0;
-  }
-
-  void _toggleDropdown(int index) {
-    setState(() {
-      _openDropdownIndex = _openDropdownIndex == index ? null : index;
-    });
-  }
+  const _MealWrapper({
+    required this.meal,
+    required this.messId,
+    required this.day,
+  });
 
   Future<String?> _getUserMessId() async {
     final prefs = await SharedPreferences.getInstance();
-    return prefs.getString('messID') ?? 'xyz';
-  }
-
-  Widget _buildExpandableSection(int index, String title) {
-    final bool isOpen = _openDropdownIndex == index;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        GestureDetector(
-          onTap: () => _toggleDropdown(index),
-          child: Container(
-            padding: EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: isOpen ? BorderRadius.vertical(top: Radius.circular(10)) : BorderRadius.circular(10),
-              border: Border(
-                top: BorderSide(color: Color(0xFFB8B8B8), width: 1),
-                left: BorderSide(color: Color(0xFFB8B8B8), width: 1),
-                right: BorderSide(color: Color(0xFFB8B8B8), width: 1),
-                bottom: isOpen
-                    ? BorderSide.none
-                    : BorderSide(color: Color(0xFFB8B8B8), width: 1),
-              ),
-            ),
-            child: Text(
-              title,
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-            ),
-          ),
-        ),
-        AnimatedContainer(
-          duration: Duration(milliseconds: 300),
-          curve: Curves.easeInOut,
-          height: isOpen ? 200 : 0,
-          padding: EdgeInsets.symmetric(horizontal: 12),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.vertical(bottom: Radius.circular(10)),
-            border: Border(
-              bottom: BorderSide(color: const Color(0xFFB8B8B8), width: 1),
-              left: BorderSide(color: const Color(0xFFB8B8B8), width: 1),
-              right: BorderSide(color: const Color(0xFFB8B8B8), width: 1),
-            ),
-          ),
-          child: Visibility(
-            visible: isOpen,
-            maintainState: true,
-            maintainAnimation: true,
-            child: FutureBuilder<String?>(
-              future: _getUserMessId(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(child: CircularProgressIndicator(strokeWidth: 2));
-                } else if (snapshot.hasError) {
-                  return Text("Error: ${snapshot.error}");
-                } else {
-                  return Consumer<MessInfoProvider>(
-                    builder: (context, messProvider, child) {
-                      return HorizontalMenuBuilder(
-                        messId: copyMessID,
-                        day: selectedDay,
-                        userMessId: snapshot.data,
-                      );
-                    },
-                  );
-                }
-              },
-            ),
-          ),
-        ),
-
-        SizedBox(height: 10),
-      ],
-    );
+    return prefs.getString('messID') ?? '';
   }
 
   @override
   Widget build(BuildContext context) {
-    return IntrinsicHeight(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildExpandableSection(0, 'Breakfast'),
-          _buildExpandableSection(1, 'Lunch'),
-          _buildExpandableSection(2, 'Dinner'),
-          SizedBox(height: 16),
-        ],
-      ),
+    return FutureBuilder<String?>(
+      future: _getUserMessId(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Padding(
+            padding: EdgeInsets.all(12),
+            child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+          );
+        }
+        final userMessId = snapshot.data ?? '';
+        return HorizontalMenuBuilder(
+          messId: messId,
+          day: day,
+          userMessId: userMessId,
+          mealType: meal,
+        );
+      },
     );
   }
 }
+
+
 
 
 

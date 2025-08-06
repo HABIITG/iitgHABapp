@@ -4,7 +4,9 @@ const path = require('path');
 const fs = require('fs');
 require('dotenv').config();
 const xlsx = require('xlsx');
+const {Feedback} = require('./feedbackModel');
 const { User } = require('../user/userModel');
+
 
 const authId = process.env.OUTLOOK_ID;
 const authPass = process.env.OUTLOOK_PASS;

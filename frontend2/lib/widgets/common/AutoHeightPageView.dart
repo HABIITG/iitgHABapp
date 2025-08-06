@@ -88,10 +88,15 @@ class _MenuPagerState extends State<MenuPager> {
                 // **ADD SCROLLING**
                 child: IndividualMealCard(
                   menu: menu,
-                  currentMessId: widget.messId,
-                  userMessId: widget.userMessId,
+                  isSubscribed: widget.userMessId == widget.messId, // ✅ fixed
                   parseTime: _parseTime,
-                  formatDuration: _formatDuration,
+                  onExpandedChanged: () {
+                    // ✅ re-measure after expansion
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      // Trigger measure again
+                      setState(() {});
+                    });
+                  },
                 ),
               ),
             ),

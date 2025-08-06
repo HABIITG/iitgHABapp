@@ -13,8 +13,8 @@ const messChangeRouter = express.Router();
 
 messChangeRouter.get("/all",getAllMessChangeRequestsForAllMess );
 messChangeRouter.post("/reqchange", messChangeRequest);
-messChangeRouter.patch("/accept/:userId",acceptMessChangeRequest );
-messChangeRouter.patch("/reject/:userId", rejectMessChangeRequest);
+messChangeRouter.patch("/accept",acceptMessChangeRequest );
+messChangeRouter.patch("/reject", rejectMessChangeRequest);
 messChangeRouter.get("/:hostelId",getAllMessChangeRequests );
 
 

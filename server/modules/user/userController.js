@@ -1,6 +1,7 @@
 const { User } = require("./userModel.js");
 const { Hostel } = require("../hostel/hostelModel.js");
 
+
 const getUserData = async (req, res, next) => {
   //console.log(req);
   return res.json(req.user);

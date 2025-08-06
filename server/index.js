@@ -1,5 +1,9 @@
 // server/index.js
 //import authRoutes from "./modules/auth/auth.routes.js";
+
+
+require('dotenv').config();
+console.log("MONGODB_URI from env:", process.env.MONGODB_URI);
 const authRoutes = require("./modules/auth/auth.routes.js");
 const express = require("express");
 const mongoose = require("mongoose");
@@ -99,7 +103,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // MongoDB connection
 mongoose
-  .connect(MONGOdb_uri, { useNewUrlParser: true, useUnifiedTopology: true })
+  .connect(MONGOdb_uri)
   .then(() => {
     console.log("MongoDB connected");
 
@@ -125,6 +129,8 @@ mongoose
 app.get("/", (req, res) => {
   res.send("Backend is running");
 });
+
+
 
 /**
  * @swagger

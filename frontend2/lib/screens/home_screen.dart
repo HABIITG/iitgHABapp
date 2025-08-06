@@ -139,7 +139,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     const SizedBox(height: 8),
                     const Text(
-                      "New Complaint",
+                      "Complaint",
                       style: TextStyle(
                         color: Colors.black,
                         fontWeight: FontWeight.w600,

@@ -62,6 +62,7 @@ const user = await User.findById( userId);
     
     // console.log(messChange.got_mess_changed)
       messChange.got_mess_changed = true;
+      messChange.status = 'approved';
       await messChange.save();
 
     //Remove user's mess change request entry from their current hostel
@@ -87,12 +88,19 @@ const rejectMessChangeRequest = async (req, res) => {
     const user = await User.findById(userId);
     if (!user) return res.status(404).json({ message: "User not found" });
 
+    const messChange = await MessChange.findOne({rollNumber : user.rollNumber});
+
     // Reset mess change-related fields
     user.applied_for_mess_changed = false;
     user.mess_change_button_pressed = false;
     user.applied_hostel_string = "";
     user.next_mess = user.curr_subscribed_mess; // Reset to current mess
     await user.save();
+
+    //updating messChange
+
+    messChange.status = 'rejected';
+    await messChange.save();
 
     // Remove user's request from current hostel's users list
     await Hostel.updateOne(

@@ -1,12 +1,15 @@
-const { User } = require('../user/userModel');
+const {User}  = require('../user/userModel');
 const {Hostel} =require('../hostel/hostelModel');
+const Feedback = require('./feedbackModel');
 const xlsx = require('xlsx');
 const path = require('path');
 const fs = require('fs');
 
+
 const feedbackFilePath = path.join(__dirname, '../output', 'Feedback_Report.xlsx');
 
 const submitFeedback = async (req, res) => {
+  console.log("request received");
   try {
     const { name, rollNumber, breakfast, lunch, dinner, comment } = req.body;
      console.log('Received feedback:', req.body);
@@ -24,46 +27,59 @@ const submitFeedback = async (req, res) => {
     }
 
     // 3. Get hostel name
-    let hostelName = 'Unknown';
-    if (user.hostel) {
-      const hostelDoc = await Hostel.findById(user.hostel);
-      hostelName = hostelDoc?.hostel_name || 'Unknown';
-    }
+    // let hostelName = 'Unknown';
+    // if (user.hostel) {
+    //   const hostelDoc = await Hostel.findById(user.hostel);
+    //   hostelName = hostelDoc?.hostel_name || 'Unknown';
+    // }
 
     // 4. Get current mess name
-    let currentMessName = 'Unknown';
-    if (user.curr_subscribed_mess) {
-      const currMessDoc = await Hostel.findById(user.curr_subscribed_mess);
-      currentMessName = currMessDoc?.hostel_name || 'Unknown';
-    }
+    // let currentMessName = 'Unknown';
+    // if (user.curr_subscribed_mess) {
+    //   const currMessDoc = await Hostel.findById(user.curr_subscribed_mess);
+    //   currentMessName = currMessDoc?.hostel_name || 'Unknown';
+    // }
 
     // 5. Prepare Excel entry
-    const newEntry = {
-      User: user.name,
-      RollNumber: user.rollNumber,
-      Hostel: hostelName,
-      CurrentMess: currentMessName,
-      Breakfast: breakfast,
-      Lunch: lunch,
-      Dinner: dinner,
-      Comment: comment || 'No comment',
-      Date: new Date().toLocaleDateString(),
-    };
+    // const newEntry = {
+    //   User: user.name,
+    //   RollNumber: user.rollNumber,
+    //   Hostel: hostelName,
+    //   CurrentMess: currentMessName,
+    //   Breakfast: breakfast,
+    //   Lunch: lunch,
+    //   Dinner: dinner,
+    //   Comment: comment || 'No comment',
+    //   Date: new Date().toLocaleDateString(),
+    // };
 
-    let data = [];
-    if (fs.existsSync(feedbackFilePath)) {
-      const workbook = xlsx.readFile(feedbackFilePath);
-      const worksheet = workbook.Sheets['Feedback'];
-      data = xlsx.utils.sheet_to_json(worksheet);
-    }
+    // let data = [];
+    // if (fs.existsSync(feedbackFilePath)) {
+    //   const workbook = xlsx.readFile(feedbackFilePath);
+    //   const worksheet = workbook.Sheets['Feedback'];
+    //   data = xlsx.utils.sheet_to_json(worksheet);
+    // }
 
-    data.push(newEntry);
+    // data.push(newEntry);
 
-    const worksheet = xlsx.utils.json_to_sheet(data);
-    const workbook = xlsx.utils.book_new();
-    xlsx.utils.book_append_sheet(workbook, worksheet, 'Feedback');
-    fs.mkdirSync(path.dirname(feedbackFilePath), { recursive: true });
-    xlsx.writeFile(workbook, feedbackFilePath);
+    // const worksheet = xlsx.utils.json_to_sheet(data);
+    // const workbook = xlsx.utils.book_new();
+    // xlsx.utils.book_append_sheet(workbook, worksheet, 'Feedback');
+    // fs.mkdirSync(path.dirname(feedbackFilePath), { recursive: true });
+    // xlsx.writeFile(workbook, feedbackFilePath);
+
+    // 5. Prepare to upload data in form of schema 
+    const feedback = new Feedback({
+      user: user._id,
+      breakfast,
+      lunch,
+      dinner,
+      comment,
+      timestamp: new Date(),
+    });
+
+    await feedback.save();
+
 
     // 6. Mark feedback as submitted
     user.feedbackSubmitted = true;
@@ -97,26 +113,35 @@ const removeFeedback = async (req, res) => {
       return res.status(400).send("No feedback submitted by this user");
     }
 
+    
+
+    // // 2. Update user document
+    // user.feedbackSubmitted = false;
+    // await user.save();
+
+    // 1. Delete feedback from MongoDB
+    await Feedback.deleteOne({ user: user._id });
+
+    // 3. Remove entry from Excel file (if exists)
+    // if (fs.existsSync(feedbackFilePath)) {
+    //   const workbook = xlsx.readFile(feedbackFilePath);
+    //   const worksheet = workbook.Sheets['Feedback'];
+    //   let data = xlsx.utils.sheet_to_json(worksheet);
+
+    //   // Filter out feedback of the user
+    //   data = data.filter(entry =>
+    //     entry.RollNumber !== rollNumber || entry.User !== name
+    //   );
+
+    //   const newSheet = xlsx.utils.json_to_sheet(data);
+    //   const newWorkbook = xlsx.utils.book_new();
+    //   xlsx.utils.book_append_sheet(newWorkbook, newSheet, 'Feedback');
+    //   xlsx.writeFile(newWorkbook, feedbackFilePath);
+    // }
+
     // 2. Update user document
     user.feedbackSubmitted = false;
     await user.save();
-
-    // 3. Remove entry from Excel file (if exists)
-    if (fs.existsSync(feedbackFilePath)) {
-      const workbook = xlsx.readFile(feedbackFilePath);
-      const worksheet = workbook.Sheets['Feedback'];
-      let data = xlsx.utils.sheet_to_json(worksheet);
-
-      // Filter out feedback of the user
-      data = data.filter(entry =>
-        entry.RollNumber !== rollNumber || entry.User !== name
-      );
-
-      const newSheet = xlsx.utils.json_to_sheet(data);
-      const newWorkbook = xlsx.utils.book_new();
-      xlsx.utils.book_append_sheet(newWorkbook, newSheet, 'Feedback');
-      xlsx.writeFile(newWorkbook, feedbackFilePath);
-    }
 
     res.status(200).send("Feedback removed successfully");
 

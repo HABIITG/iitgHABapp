@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend1/screens/MainNavigationScreen.dart';
 
 class ComingSoonScreen extends StatelessWidget {
   const ComingSoonScreen({super.key});
@@ -7,7 +8,12 @@ class ComingSoonScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(appBar: AppBar(
       backgroundColor: Colors.white,
-      leading: BackButton(),
+      leading: IconButton(
+        icon: Icon(Icons.arrow_back),
+        onPressed: () {
+          Navigator.push(context, MaterialPageRoute(builder: (context) => const MainNavigationScreen()));
+        },
+      ),
     ),
       backgroundColor: Colors.white,
       body: Center(
