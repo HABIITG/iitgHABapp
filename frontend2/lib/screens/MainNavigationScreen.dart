@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend1/screens/mess_screen/new_mess_screen.dart';
 import 'package:frontend1/utilities/ComingSoon.dart';
 import 'home_screen.dart';
 import 'mess_screen.dart';
@@ -26,7 +27,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   Widget build(BuildContext context) {
     final screens = [
       HomeScreen(onNavigateToTab: _handleNavTap),
-      MessScreen(),
+      NewMessScreen(),
       ComingSoonScreen(),
     ];
     return Scaffold(
