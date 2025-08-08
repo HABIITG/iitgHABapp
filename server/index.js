@@ -13,6 +13,7 @@ const cookieParser = require("cookie-parser");
 const complaintRoute = require("./modules/complaint/complaintRoute.js");
 const feedbackRoute = require("./modules/feedback/feedbackRoute.js");
 const hostelRoute = require("./modules/hostel/hostelRoute.js");
+const notificationRoute = require("./modules/notification/notificationRoute.js");
 const qrRoute = require("./modules/qr/qrRoute.js");
 const messRoute = require("./modules/mess/messRoute.js");
 const logsRoute = require("./modules/mess/ScanLogsRoute.js");
@@ -163,6 +164,9 @@ app.use("/api/auth", authRoutes);
 
 //hostel route
 app.use("/api/hostel", hostelRoute);
+
+//notification route
+app.use("/api/notification", notificationRoute);
 
 //qr route
 app.use("/api/qr", qrRoute);

@@ -1,3 +1,5 @@
+const { authenticateJWT } = require("../../middleware/authenticateJWT.js");
+
 const express = require("express");
 
 const {
@@ -5,17 +7,15 @@ const {
   getAllMessChangeRequestsForAllMess,
   acceptMessChangeRequest,
   rejectMessChangeRequest,
-  messChangeRequest
+  messChangeRequest,
 } = require("./messchangeController.js");
 
 const messChangeRouter = express.Router();
 
-
-messChangeRouter.get("/all",getAllMessChangeRequestsForAllMess );
-messChangeRouter.post("/reqchange", messChangeRequest);
-messChangeRouter.patch("/accept",acceptMessChangeRequest );
-messChangeRouter.patch("/reject", rejectMessChangeRequest);
-messChangeRouter.get("/:hostelId",getAllMessChangeRequests );
-
+messChangeRouter.get("/all", getAllMessChangeRequestsForAllMess);
+messChangeRouter.post("/reqchange", authenticateJWT, messChangeRequest);
+messChangeRouter.patch("/accept/:userId", acceptMessChangeRequest);
+messChangeRouter.patch("/reject/:userId", rejectMessChangeRequest);
+messChangeRouter.get("/:hostelId", getAllMessChangeRequests);
 
 module.exports = messChangeRouter;

@@ -1,5 +1,8 @@
 const String baseUrl = "https://hab.codingclub.in/api";
 
+class MessChange {
+  static const String messChangeRequest = "$baseUrl/mess-change/reqchange";
+}
 
 class UserEndpoints {
   static const String currentUser = '$baseUrl/users/';

@@ -3,29 +3,29 @@ import 'package:flutter/material.dart';
 class HostelDrop extends StatefulWidget {
   final Function(String) onChanged;
 
-  const HostelDrop({Key? key, required this.onChanged}) : super(key: key);
+  const HostelDrop({super.key, required this.onChanged});
 
   @override
   _HostelDropState createState() => _HostelDropState();
 }
 
 class _HostelDropState extends State<HostelDrop> {
-  String selectedHostel = 'Brahmaputra';
+  String selectedHostel = 'Barak';
 
   final List<String> hostels = [
-    'Brahmaputra',
-    'Disang',
-    'Dihing',
-    'Dhansiri',
-    'Subansiri',
-    'Siang',
-    'Lohit',
-    'Manas',
-    'Umiam',
     'Barak',
-    'Kapili',
+    'Brahmaputra',
+    'Dhansiri',
+    'Dihing',
+    'Disang',
     'Gaurang',
     'Kameng',
+    'Kapili',
+    'Lohit',
+    'Manas',
+    'Siang',
+    'Subansiri',
+    'Umiam',
   ];
 
   final GlobalKey _key = GlobalKey();
@@ -57,7 +57,7 @@ class _HostelDropState extends State<HostelDrop> {
                     title: Text(
                       hostel,
                       style: TextStyle(
-                        color: hostel == selectedHostel ? Color(0xFF3754DB) : Colors.black,
+                        color: hostel == selectedHostel ? const Color(0xFF3754DB) : Colors.black,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -90,12 +90,12 @@ class _HostelDropState extends State<HostelDrop> {
         children: [
           Text(
             selectedHostel,
-            style: TextStyle(
+            style: const TextStyle(
               color: Color(0xFF3754DB),
               fontWeight: FontWeight.w500,
             ),
           ),
-          Icon(Icons.keyboard_arrow_down_rounded, color: Color(0xFF3754DB)),
+          const Icon(Icons.keyboard_arrow_down_rounded, color: Color(0xFF3754DB)),
         ],
       ),
     );

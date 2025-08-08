@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-
+import 'mess_preference.dart';
 import 'package:frontend1/constants/endpoint.dart';
 import 'package:frontend1/screens/mess_change.dart';
 import 'package:frontend1/screens/mess_change_screen.dart';
@@ -124,8 +124,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     Container(
                       width: 40,
                       height: 40,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF3754DB),
+                      decoration:const  BoxDecoration(
+                        color: Color(0xFF3754DB),
                         shape: BoxShape.circle,
                       ),
                       child: Center(
@@ -174,8 +174,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     Container(
                       width: 40,
                       height: 40,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF3754DB),
+                      decoration: const BoxDecoration(
+                        color: Color(0xFF3754DB),
                         shape: BoxShape.circle,
                       ),
                       child: Center(
@@ -209,7 +209,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 Navigator.push(
                   context,
                   // MaterialPageRoute(builder: (context) => MessChangeScreen()),
-                  MaterialPageRoute(builder: (context) => MessChangeReq()),
+                  MaterialPageRoute(builder: (context) => const MessChangePreferenceScreen()),
                 );
               },
               child: Container(
@@ -225,8 +225,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     Container(
                       width: 40,
                       height: 40,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF3754DB),
+                      decoration: const BoxDecoration(
+                        color: Color(0xFF3754DB),
                         shape: BoxShape.circle,
                       ),
                       child: Center(
@@ -297,7 +297,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 color: Colors.white,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.all(Radius.circular(24)),
-                  side: BorderSide(color: Color(0xC5C5D1), width: 1),
+                  side: BorderSide(color: Color(0xFFC5C5D1), width: 1),
                 ),
                 elevation: 0.5,
                 child: Padding(
