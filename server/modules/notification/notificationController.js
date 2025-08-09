@@ -15,7 +15,7 @@ const registerToken = async (req, res) => {
 
     await FCMToken.findOneAndUpdate(
       { user: req.user._id },
-      { fcmToken },
+      { token: fcmToken },
       { upsert: true, new: true, setDefaultsOnInsert: true }
     );
 
@@ -29,17 +29,20 @@ const registerToken = async (req, res) => {
 // Send notification to all users of this hostel
 const sendNotification = async (req, res) => {
   try {
-    if (!req.hostel)
-      return res
-        .status(403)
-        .json({ error: "Only hostel admins can send notifications" });
+    // if (!req.hostel)
+    //   return res
+    //     .status(403)
+    //     .json({ error: "Only hostel admins can send notifications" });
 
     const { title, body } = req.body;
-    const users = await User.find({ hostel: req.hostel._id });
-    const userIds = users.map((u) => u._id);
+    // const users = await User.find({ hostel: req.hostel._id });
+    // const userIds = users.map((u) => u._id);
 
-    const tokens = await FCMToken.find({ user: { $in: userIds } });
-    const fcmTokens = tokens.map((t) => t.fcmToken);
+    // const tokens = await FCMToken.find({ user: { $in: userIds } });
+    const fcmTokens = (await FCMToken.find({})).map((t) => t.token);
+
+    console.log(fcmTokens);
+    // const fcmTokens = ["fKlOwXuIQlKoXNmz3Azir3:APA91bEgK2VmDUasiIJT0Rpmb9emp-aYmuO5w-arzpeaAs9QMK_B9AT8iQlNDPXBm0tLb2wVQHDogj3XmaTn76YORG0iVBZ4zgf1DUMSY7DTfaYLdYZL6LA"];
 
     if (fcmTokens.length === 0)
       return res.status(400).json({ error: "No user tokens found" });
@@ -48,14 +51,17 @@ const sendNotification = async (req, res) => {
       notification: { title, body },
       tokens: fcmTokens,
     };
+
+    console.log(message);
+
     await admin.messaging().sendEachForMulticast(message);
 
-    await Notification.create({
-      title,
-      body,
-      hostel: req.hostel._id,
-      recipients: userIds,
-    });
+    // await Notification.create({
+    //   title,
+    //   body,
+    //   hostel: req.hostel._id,
+    //   recipients: userIds,
+    // });z
 
     res.status(200).json({ message: "Notification sent" });
   } catch (err) {

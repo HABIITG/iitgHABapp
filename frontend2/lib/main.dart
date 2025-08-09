@@ -16,11 +16,14 @@ import 'package:provider/provider.dart';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:frontend1/screens/profile_screen.dart';
-
+import 'package:frontend1/utilities/notifications.dart';
+import 'package:firebase_core/firebase_core.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final bool asLoggedIn = await isLoggedIn();
+  await Firebase.initializeApp();
+
   await getUserMessInfo();
 
   runApp(
@@ -55,6 +58,9 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
+
+    isLoggedIn().then((asLoggedIn) => {if (asLoggedIn) registerFcmToken()});
+    listenNotifications();
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       // This ensures it runs after the first frame
@@ -114,9 +120,8 @@ class _MyAppState extends State<MyApp> {
       debugShowCheckedModeBanner: false,
       navigatorKey: navigatorKey,
 
-      // home: widget.isLoggedIn ? MainNavigationScreen() : LoginScreen(),
-     home: MainNavigationScreen(),
-     // home: MessFeedbackPage(),
+      home: widget.isLoggedIn ? const MainNavigationScreen() : const LoginScreen(),
+      // home: MainNavigationScreen(),
 
       //home:  ProfileScreen(),
       builder: EasyLoading.init(),

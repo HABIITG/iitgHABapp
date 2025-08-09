@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:frontend1/screens/notification.dart';
-
+import 'package:shared_preferences/shared_preferences.dart';
 import '../screens/mess_feedback/mess_feedback_page.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 class ComplaintsCard extends StatefulWidget {
   const ComplaintsCard(
@@ -15,6 +16,32 @@ class ComplaintsCard extends StatefulWidget {
 
 class _ComplaintsCardState extends State<ComplaintsCard> {
   int expandedSection = 2;
+
+  int num_notification = 0;
+
+  Future<void> _loadNotificationCount() async {
+    final prefs = await SharedPreferences.getInstance();
+    final List<String> stored = prefs.getStringList('notifications') ?? [];
+    setState(() {
+      num_notification = stored.length;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    SharedPreferences.getInstance().then((prefs) => {setState(() {
+      num_notification = (prefs.getStringList('notifications') ?? []).length;
+      // Firebase Messaging setup
+      FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
+          setState(() {
+            num_notification += 1;
+            //storedNotifications = stored;
+          });
+        });
+      }
+    )});
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -218,35 +245,20 @@ class _ComplaintsCardState extends State<ComplaintsCard> {
             ),
           ),
         ),
+        // Notifications Card
         GestureDetector(
           onTap: () {
-            // Navigator.of(context).push(PageRouteBuilder(
-            //   transitionDuration: Duration(milliseconds: 800),
-            //   pageBuilder: (context, animation, secondaryAnimation) =>
-            //       NotificationScreen(),
-            //   transitionsBuilder:
-            //       (context, animation, secondaryAnimation, child) {
-            //     final tween = Tween(begin: Offset(0, 1), end: Offset.zero)
-            //         .chain(CurveTween(curve: Curves.easeOutCubic));
-
-            //     return SlideTransition(
-            //       position: animation.drive(tween),
-            //       child: child,
-            //     );
-            //   },
-            // ));
             showModalBottomSheet(
               context: context,
               isScrollControlled: true,
               backgroundColor: Colors.transparent,
-              builder: (context) => NotificationScreen(),
+              builder: (context) => const NotificationScreen(),
             );
           },
           child: Card(
             color: Colors.white,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
-              //side: BorderSide(color: Colors.red, width: 0.5)
             ),
             elevation: 0.5,
             child: Padding(
@@ -254,19 +266,30 @@ class _ComplaintsCardState extends State<ComplaintsCard> {
               child: Row(
                 children: [
                   CircleAvatar(
-                      radius: 12,
-                      backgroundColor: Colors.blue[50],
-                      child: Icon(Icons.notifications_none,
-                          weight: 20, color: Colors.blue, size: 16)),
-                  SizedBox(
-                    width: 12,
+                    radius: 12,
+                    backgroundColor: Colors.blue[50],
+                    child: const Icon(
+                      Icons.notifications_none,
+                      size: 16,
+                      color: Colors.blue,
+                    ),
                   ),
-                  Text("Notifications",
-                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                            //color: Colors.red,
-                            fontWeight: FontWeight.w500,
-                            fontSize: 16,
-                          )),
+                  const SizedBox(width: 12),
+                  Text(
+                    "Notifications",
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 16,
+                        ),
+                  ),
+                  Text(
+                    " ($num_notification)",
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: Colors.black,
+                          fontWeight: FontWeight.w500,
+                          fontSize: 16,
+                        ),
+                  ),
                 ],
               ),
             ),

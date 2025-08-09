@@ -23,6 +23,24 @@ const loginHandler = (req, res) => {
 
 // Function to calculate semester (if needed)
 
+//** */
+const getHostelAlloc = async (rollno) => {
+  try {
+    const user = await UserAllocHostel.findOne({ rollNumber: rollno }).populate('hostel');
+
+    if (!user) {
+      return res.status(400).json({ message: "No such roll exists" });
+    }
+
+    const hostelname = user.hostel.name;
+
+    return res.status(200).json({ message: "hostel found", hostel: hostelname });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ message: "Error occured" });
+  }
+};
+
 const mobileRedirectHandler = async (req, res, next) => {
   try {
     const { code } = req.query;
@@ -86,6 +104,10 @@ const mobileRedirectHandler = async (req, res, next) => {
         rollNumber: userFromToken.data.surname,
         email: userFromToken.data.mail,
       };
+      
+      const hostelAlloc = await getHostelAlloc(userFromToken.data.surname);
+      console.log("hostelAlloc is", hostelAlloc);
+      userData.hostel = hostelAlloc;
 
       //console.log(userData);
 

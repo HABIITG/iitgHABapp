@@ -9,11 +9,13 @@ const {
   acceptMessChangeRequest,
   rejectMessChangeRequest,
   messChangeRequest,
+  messChangeStatus,
 } = require("./messchangeController.js");
 
 const messChangeRouter = express.Router();
 
 messChangeRouter.get("/all", getAllMessChangeRequestsForAllMess);
+messChangeRouter.get("/status", authenticateJWT, messChangeStatus);
 messChangeRouter.post("/reqchange", authenticateJWT, messChangeRequest);
 messChangeRouter.post("/accept-all/:hostelId", acceptAndRejectByFCFS); //accept all by first come first serve and reject rest
 messChangeRouter.patch("/accept/:userId", acceptMessChangeRequest);

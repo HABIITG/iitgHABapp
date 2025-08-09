@@ -20,7 +20,52 @@ class _MessChangePreferenceScreenState
   String? firstpref;
   // String? secondpref;
 
+  bool alreadyApplied = false;
+  String? appliedHostel;
+
+  Future<void> checkMessChangeStatus() async {
+    print("🥴🥴🥴🥴🥴 entered into check mess change status");
+    final dio = Dio();
+
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('access_token');
+      print(token);
+      String url = MessChange.messChangeStatus;
+
+      final res = await dio.get(
+        url,
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $token',
+            'Content-Type': 'application/json'
+          },
+        ),
+      );
+
+      print("🙂🙂🙂🙂🙂🙂mess change ststaus code: ${res.statusCode}, message: ${res.data['message']}");
+
+      if (res.statusCode == 200) {
+        setState(() {
+          alreadyApplied = res.data['applied'];
+          appliedHostel = res.data['hostel'];
+        });
+      }
+    } catch (e) {
+      print('Error fetching status: $e');
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    checkMessChangeStatus();
+  }
+
   Future<void> handleSubmit(String? firstpref) async {
+    final prefs = await SharedPreferences.getInstance();
+    final String? currentMess = prefs.getString('currentMess') ?? "";
+
     if (firstpref == null) {
       //Show error/snackbar
       showDialog(
@@ -58,10 +103,30 @@ class _MessChangePreferenceScreenState
     //   );
     //   return;
     // }
+
+    if (firstpref == currentMess) {
+      //Show error/snackbar
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text("Error"),
+          content: const Text("Choose a mess different from default mess"),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text("OK"),
+            ),
+          ],
+        ),
+      );
+      return;
+    }
+
     final dio = Dio();
 
     try {
-      final prefs = await SharedPreferences.getInstance();
       final String? UserId = prefs.getString('userId');
       //?? What is the url
       String url = MessChange.messChangeRequest;
@@ -264,24 +329,29 @@ class _MessChangePreferenceScreenState
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
         height: 94,
         decoration: const BoxDecoration(
-            border:
-                Border(top: BorderSide(width: 1, color: Color(0xFFE5E5E5)))),
-        child: ElevatedButton(
-          onPressed: () {
-            handleSubmit(firstpref);
-            setState(() {
-              first = false;
-            });
-          },
-          style: ButtonStyle(
-            backgroundColor: WidgetStateProperty.all(const Color(0xFF4C4EDB)),
-            elevation: WidgetStateProperty.all(0),
-          ),
-          child: const Text(
-            'Submit',
-            style: TextStyle(fontSize: 16, color: Colors.white),
-          ),
-        ),
+            border: Border(top: BorderSide(width: 1, color: Color(0xFFE5E5E5)))),
+            child: ElevatedButton(
+              onPressed: alreadyApplied
+                  ? null // disables button
+                  : () {
+                      handleSubmit(firstpref);
+                      setState(() {
+                        first = false;
+                      });
+                    },
+              style: ButtonStyle(
+                backgroundColor: WidgetStateProperty.all(
+                  alreadyApplied ? Colors.grey : const Color(0xFF4C4EDB),
+                ),
+                elevation: WidgetStateProperty.all(0),
+              ),
+              child: Text(
+                alreadyApplied
+                    ? 'Request already sent to $appliedHostel'
+                    : 'Submit',
+                style: const TextStyle(fontSize: 16, color: Colors.white),
+              ),
+            ),
       ),
     );
   }

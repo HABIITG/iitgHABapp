@@ -42,8 +42,14 @@ const Sidebar = () => {
       key: "6",
       name: "Hostel Statistics",
       path: "/hostelstats",
-      icon: <BarChartOutlined />,
+      icon: <BarChartOutlined />
     },
+    {
+      key: "7",
+      name: "Mess Change Applications",
+      path: "/mess/changeapplication",
+      icon: <BarChartOutlined />
+    }
   ];
 
   useEffect(() => {

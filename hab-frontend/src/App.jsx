@@ -11,7 +11,8 @@ import MessDetails from "./components/MessDetails";
 import MessMenu from "./components/MessMenu";
 import HostelForm from "./pages/HostelForm";
 import HostelPage from "./pages/HostelPage";
-
+import MessChangeCard from "./Components/MessChangeCard";
+import MessChangePage from "./pages/MessChangePage.jsx";
 
 function App() {
   return (
@@ -29,6 +30,7 @@ function App() {
             <Route path="/create-mess" element={<CreateMess />} />
             <Route path="/mess/:id" element={<MessDetails />} />
             <Route path="/mess/menu/:id" element={<MessMenu />} />
+            <Route path="/mess/changeapplication" element={ <><MessChangePage/></> } />
           </Routes>
         </div>
       </div>

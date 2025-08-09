@@ -60,6 +60,7 @@ dependencies:
   provider: ^6.1.5
   dropdown_button2: ^2.3.9
   intl: ^0.20.2
+  firebase_messaging: ^15.2.10
 
 
 dev_dependencies:
