@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:pretty_qr_code/pretty_qr_code.dart';
 
 class QRCodeScannerWithFrame extends StatelessWidget {
   final String qrData;
@@ -23,7 +22,8 @@ class QRCodeScannerWithFrame extends StatelessWidget {
                   color: Colors.greenAccent,
                   width: 4.0,
                 ),
-                borderRadius: BorderRadius.circular(0.0), // Set to 0 for a square shape
+                borderRadius:
+                    BorderRadius.circular(0.0), // Set to 0 for a square shape
               ),
             ),
           ),

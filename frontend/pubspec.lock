@@ -424,22 +424,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.8"
-  pretty_qr_code:
-    dependency: "direct main"
-    description:
-      name: pretty_qr_code
-      sha256: "2291db3f68d70a3dcd46c6bd599f30991ae4c02f27f36215fbb3f4865a609259"
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.5.0"
-  qr:
-    dependency: transitive
-    description:
-      name: qr
-      sha256: "5a1d2586170e172b8a8c8470bbbffd5eb0cd38a66c0d77155ea138d3af3a4445"
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.0.2"
   shared_preferences:
     dependency: "direct main"
     description:

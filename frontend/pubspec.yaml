@@ -37,7 +37,6 @@ dependencies:
   cupertino_icons: ^1.0.8
   shared_preferences: ^2.3.2
   http: ^1.2.2
-  flutter_vibrate: ^1.3.0
   animated_text_kit: ^4.2.2
   sign_in_button: ^3.2.0
   flutter_svg: ^2.0.10+1
@@ -46,10 +45,10 @@ dependencies:
   hive_flutter: ^1.1.0
   flutter_easyloading: ^3.0.5
   flutter_appauth: ^7.0.1
-  pretty_qr_code: ^3.3.0
   mobile_scanner: ^6.0.1
   intl: ^0.18.0
   permission_handler: ^11.3.1
+  flutter_vibrate: ^1.3.0
 
 dev_dependencies:
   flutter_test:

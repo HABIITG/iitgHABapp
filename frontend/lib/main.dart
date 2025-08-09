@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:frontend/screens/login_screen.dart';
-import 'package:frontend/screens/main_navigation.dart'; // Import the MainScreen
+import 'package:frontend/screens/main_screen.dart'; // Import the MainScreen
 import 'package:frontend/utilities/startup/startup_items.dart';
 
 Future<void> main() async {

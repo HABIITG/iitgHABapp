@@ -1,12 +1,14 @@
-import 'package:flutter/material.dart';
-import 'package:mobile_scanner/mobile_scanner.dart';
-import 'package:frontend/utilities/permissionhandle/handler.dart';
-import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:frontend/apis/protected.dart';
+
+import 'package:flutter/material.dart';
 import 'package:flutter_vibrate/flutter_vibrate.dart';
-import 'package:frontend/widgets/common/cornerQR.dart';
+import 'package:frontend/apis/protected.dart';
 import 'package:frontend/constants/endpoints.dart';
+import 'package:frontend/utilities/permissionhandle/handler.dart';
+import 'package:frontend/widgets/common/cornerQR.dart';
+import 'package:http/http.dart' as http;
+import 'package:mobile_scanner/mobile_scanner.dart';
+
 import '../../screens/qr_detail.dart';
 
 class QrScan extends StatefulWidget {
@@ -18,7 +20,8 @@ class QrScan extends StatefulWidget {
 
 class _QrScanState extends State<QrScan> {
   late MobileScannerController controller;
-  bool _hasScanned = false; // Flag to track if a scan has been processed VERY IMP CONCEPT like this happens it scans twice maybe idk
+  bool _hasScanned =
+      false; // Flag to track if a scan has been processed VERY IMP CONCEPT like this happens it scans twice maybe idk
 
   @override
   void initState() {
@@ -121,5 +124,3 @@ class _QrScanState extends State<QrScan> {
     );
   }
 }
-
-

@@ -1,23 +1,16 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'mess_preference.dart';
-import 'package:frontend1/constants/endpoint.dart';
-import 'package:frontend1/screens/mess_change.dart';
-import 'package:frontend1/screens/mess_change_screen.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:frontend1/screens/profile_screen.dart';
 import 'package:frontend1/screens/qr_scanner.dart';
 import 'package:frontend1/utilities/ComingSoon.dart';
-import 'package:frontend1/widgets/mess_widgets/MessMenuBuilder.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:frontend1/widgets/common/name_trimmer.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:http/http.dart' as http;
-import 'package:frontend1/models/mess_menu_model.dart';
-import 'package:frontend1/widgets/mess_widgets/messmenu.dart';
+import 'package:frontend1/widgets/mess_widgets/MessMenuBuilder.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../utilities/startupitem.dart';
 import '../widgets/complaint_dropdown.dart';
+import 'mess_preference.dart';
 
 class HomeScreen extends StatefulWidget {
   final void Function(int)? onNavigateToTab;
@@ -38,7 +31,6 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     fetchUserData();
     fetchMessIdAndToken();
-
   }
 
   Future<void> fetchUserData() async {
@@ -61,7 +53,6 @@ class _HomeScreenState extends State<HomeScreen> {
       return "Good evening, ";
     }
   }
-
 
   Future<void> fetchMessIdAndToken() async {
     final prefs = await SharedPreferences.getInstance();
@@ -120,11 +111,12 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Container(
                       width: 40,
                       height: 40,
-                      decoration:const  BoxDecoration(
+                      decoration: const BoxDecoration(
                         color: Color(0xFF3754DB),
                         shape: BoxShape.circle,
                       ),
@@ -170,6 +162,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Container(
                       width: 40,
@@ -209,7 +202,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 Navigator.push(
                   context,
                   // MaterialPageRoute(builder: (context) => MessChangeScreen()),
-                  MaterialPageRoute(builder: (context) => const MessChangePreferenceScreen()),
+                  MaterialPageRoute(
+                      builder: (context) => const MessChangePreferenceScreen()),
                 );
               },
               child: Container(
@@ -221,6 +215,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Container(
                       width: 40,
@@ -358,7 +353,9 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0,),
+          padding: const EdgeInsets.symmetric(
+            horizontal: 16.0,
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -396,7 +393,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
               const SizedBox(height: 24),
-              ComplaintsCard(feedbackform: feedbackform,),
+              ComplaintsCard(
+                feedbackform: feedbackform,
+              ),
               buildQuickActions(),
               buildMessTodayCard(),
               const SizedBox(height: 32),
