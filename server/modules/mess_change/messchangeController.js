@@ -1,16 +1,12 @@
-const { Hostel } = require("../hostel/hostelModel.js");
-const { Mess } = require("../mess/messModel.js");
 const { User } = require("../user/userModel.js");
+const { Hostel } = require("../hostel/hostelModel.js");
 
 const getAllMessChangeRequests = async (req, res) => {
   const { hostelId } = req.params;
 
   try {
-    const messChangeRequests = await MessChange.find({ hostelId }).populate(
-      "hostelId",
-      "name"
-    );
-    // .populate("next_mess", "next_mess");
+    const messChangeRequests = await User.find({ next_mess: hostelId, applied_for_mess_changed: true })
+                              .sort({ applied_hostel_timestamp: 1 }); // first come first serve
 
     if (!messChangeRequests || messChangeRequests.length === 0) {
       return res
@@ -30,10 +26,96 @@ const getAllMessChangeRequests = async (req, res) => {
 
 const getAllMessChangeRequestsForAllMess = async (req, res) => {
   try {
-    const messChanges = await MessChange.find();
-    return res.status(200).json(messChanges);
+    const messChangeRequests = await User.find({applied_for_mess_changed: true});
+
+    if (!messChangeRequests || messChangeRequests.length === 0) {
+      return res
+        .status(404)
+        .json({ message: "No mess change requests found for this hostel" });
+    }
+
+    return res.status(200).json({
+      message: "Mess change requests fetched successfully",
+      data: messChangeRequests,
+    });
   } catch (err) {
     console.error(err);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+const acceptAndRejectByFCFS = async (req, res) => {
+  try {
+    const { hostelId } = req.params;
+
+    // Fetch the hostel to get capacity
+    const hostel = await Hostel.findById(hostelId);
+    if (!hostel) {
+      return res.status(404).json({ message: "Hostel not found" });
+    }
+
+    const capacity = hostel.capacity;
+
+    // Count how many users are already subscribed to this mess
+    const currentCount = await User.countDocuments({
+      curr_subscribed_mess: hostelId,
+    });
+
+    const availableSlots = capacity - currentCount;
+
+    if (availableSlots <= 0) {
+      return res.status(400).json({ message: "Mess is already full." });
+    }
+
+    // Fetch all requests for this hostel, sorted by FCFS
+    const allRequests = await User.find({
+      next_mess: hostelId,
+      applied_for_mess_changed: true,
+    }).sort({ applied_hostel_timestamp: 1 });
+
+    const acceptedUsers = [];
+    const rejectedUsers = [];
+
+    for (let i = 0; i < allRequests.length; i++) {
+      const user = allRequests[i];
+
+      if (i < availableSlots) {
+        // Accept the request
+        user.curr_subscribed_mess = user.next_mess;
+        user.applied_for_mess_changed = false;
+        user.got_mess_changed = true;
+        user.mess_change_button_pressed = false;
+        await user.save();
+
+        acceptedUsers.push({
+          id: user._id,
+          name: user.name,
+          rollNumber: user.rollNumber,
+        });
+      } else {
+        // Reject the request
+        user.applied_for_mess_changed = false;
+        user.mess_change_button_pressed = false;
+        user.applied_hostel_string = "";
+        user.next_mess = user.curr_subscribed_mess;
+        await user.save();
+        
+        rejectedUsers.push({
+          id: user._id,
+          name: user.name,
+          rollNumber: user.rollNumber,
+        });
+      }
+    }
+
+    return res.status(200).json({
+      message: `${acceptedUsers.length} requests accepted, ${rejectedUsers.length} rejected.`,
+      acceptedUsers,
+      rejectedUsers,
+    });
+
+  } catch (error) {
+    console.error("Error processing mess change requests:", error);
     return res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -41,16 +123,15 @@ const getAllMessChangeRequestsForAllMess = async (req, res) => {
 const acceptMessChangeRequest = async (req, res) => {
   try {
     const { userId } = req.body;
-
-    // console.log(userId);
-
-    const user = await User.findById(userId);
+    const user = await User.findById(userId).populate("next_mess");
     if (!user) return res.status(404).json({ message: "User not found" });
 
-    // console.log(user)
-
-    // const messChange = await MessChange.findOne({ rollNumber: user.rollNumber });
-    // console.log(messChange);
+    // check mess capacity before accepting
+    const mess = user.next_mess;
+    const currentCount = await User.countDocuments({ curr_subscribed_mess: mess._id });
+    if (currentCount >= mess.capacity) {
+      return res.status(400).json({ message: "Capacity full for this mess." });
+    }
 
     //Update user's mess details
     user.curr_subscribed_mess = user.next_mess;
@@ -58,16 +139,6 @@ const acceptMessChangeRequest = async (req, res) => {
     user.got_mess_changed = true;
     user.mess_change_button_pressed = false;
     await user.save();
-
-    // console.log(messChange.got_mess_changed)
-    // messChange.got_mess_changed = true;
-    // await messChange.save();
-
-    //Remove user's mess change request entry from their current hostel
-    // await Hostel.updateOne(
-    //   { _id: user.hostel },
-    //   { $pull: { users: { user: user._id } } }
-    // );
 
     return res.status(200).json({ message: "Mess change request accepted" });
   } catch (error) {
@@ -79,7 +150,6 @@ const acceptMessChangeRequest = async (req, res) => {
 const rejectMessChangeRequest = async (req, res) => {
   try {
     const { userId } = req.body;
-
     const user = await User.findById(userId);
     if (!user) return res.status(404).json({ message: "User not found" });
 
@@ -90,12 +160,6 @@ const rejectMessChangeRequest = async (req, res) => {
     user.next_mess = user.curr_subscribed_mess; // Reset to current mess
     await user.save();
 
-    // Remove user's request from current hostel's users list
-    await Hostel.updateOne(
-      { _id: user.hostel },
-      { $pull: { users: { user: user._id } } }
-    );
-
     return res.status(200).json({ message: "Mess change request rejected" });
   } catch (error) {
     console.error("Error rejecting mess change request:", error);
@@ -104,38 +168,38 @@ const rejectMessChangeRequest = async (req, res) => {
 };
 
 const messChangeRequest = async (req, res) => {
-  //  const { hostel_name, roll_number } = req.body;
-
-  // User.findByJWT({});
-
-  // console.log("mess change request received ");
-  // console.log(hostel_name);
-  // console.log(roll_number);
-
-  const today = new Date();
-  const dayOfMonth = today.getDate();
-
-  if (dayOfMonth < 24 || dayOfMonth > 27) {
-    return res.status(403).json({
-      message:
-        "Mess change requests are only allowed between the 24th and 27th of the month.",
-    });
-  }
-
   try {
+    // const today = new Date();
+    // const dayOfMonth = today.getDate();
+
+    // if (dayOfMonth < 24 || dayOfMonth > 27) {
+    //   return res.status(202).json({
+    //     message: "Mess change requests are only allowed between the 24th and 27th of the month.",
+    //   });
+    // }
+
     const user = req.user;
     const { mess_pref } = req.body;
     if (!req.user) {
-      return res.status(404).json({ message: "User not Found" });
+      return res.status(404).json({message: "User not Found"})
     }
+
+    const next_mess = await Hostel.findOne({hostel_name: user.mess_pref});
+    // if (!next_mess) return res.status(404).json({ message: "Mess not found" }); // foff during testing
+
     user.applied_for_mess_changed = true;
     user.applied_hostel_string = mess_pref;
     user.applied_hostel_timestamp = Date.now();
-    res.status(200).json({ message: "Request Sent" });
+    user.next_mess = next_mess._id || user.next_mess; // || user.next_mess for testing as only kapili is there
+    await user.save();
+
+    res.status(200).json({message: "Request Sent"})
   } catch (e) {
     console.log(`Error: ${e}`);
-    res.status(500).json("Internal Server Error");
+    res.status(500).json("Internal Server Error")
   }
+
+
 
   //  try {
   //    const hostel = await Hostel.findOne({hostel_name });
@@ -207,6 +271,7 @@ const messChangeRequest = async (req, res) => {
 module.exports = {
   getAllMessChangeRequests,
   getAllMessChangeRequestsForAllMess,
+  acceptAndRejectByFCFS,
   acceptMessChangeRequest,
   rejectMessChangeRequest,
   messChangeRequest,

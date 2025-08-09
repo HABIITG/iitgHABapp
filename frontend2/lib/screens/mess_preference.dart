@@ -78,7 +78,26 @@ class _MessChangePreferenceScreenState
             "mess_pref": firstpref,
             // "sec_pref": secondpref,
           });
-
+      print("Status: ${res.statusCode}");
+      if(res.statusCode==202){
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text("Mess Change Rejected"),
+            content: const Text("Mess Change is only permitted between 24th and 27th of each month."),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  Navigator.pop(context);
+                },
+                child: const Text("OK"),
+              ),
+            ],
+          ),
+        );
+        return;
+      }
       if (res.statusCode == 200) {
         //Success
         if (!mounted) {

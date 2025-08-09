@@ -29,7 +29,7 @@ class MessChangePrefs extends StatelessWidget {
       child: DropdownButton2<String>(
         isExpanded: true,
         hint: const Padding(
-          padding: EdgeInsetsGeometry.all(8),
+          padding: EdgeInsets.all(8),
           child: Text(
             'Select',
             style: TextStyle(
@@ -63,7 +63,7 @@ class MessChangePrefs extends StatelessWidget {
         selectedItemBuilder: (context) {
           return options.map((String item) {
             return Padding(
-                padding: const EdgeInsetsGeometry.symmetric(
+                padding: const EdgeInsets.symmetric(
                     horizontal: 8, vertical: 8),
                 child: Text(item,
                     style: const TextStyle(
