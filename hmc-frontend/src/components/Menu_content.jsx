@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useAuth } from "../context/AuthProvider";
+import { API_BASE_URL } from "../apis";
 
 function Menu_content(props) {
   const { user } = useAuth();
@@ -9,12 +10,31 @@ function Menu_content(props) {
     lunch: props.lunch || [],
     dinner: props.dinner || [],
   });
-  const messId = user.messId;
+
+  const [tempTimeData, setTempTimeData] = useState({
+    startTime:'',
+    endTime:''
+  });
+
+  const [editingTime, setEditingTime] = useState(null);
+
+  const [timeData, setTimeData] = useState({
+    btime_s: props.timeData.btime_s || '',
+    ltime_s: props.timeData.ltime_s || '',
+    dtime_s: props.timeData.dtime_s || '',
+    btime_e: props.timeData.btime_e || '',
+    ltime_e: props.timeData.ltime_e || '',
+    dtime_e: props.timeData.dtime_e || '',
+  });
+
+  const messId = user.messId._id;
   console.log(menuData);
 
   const [editingItem, setEditingItem] = useState(null);
   const [editValue, setEditValue] = useState("");
   const [showDropdown, setShowDropdown] = useState(null);
+
+
 
   // Update menuData when props change
   useEffect(() => {
@@ -23,13 +43,106 @@ function Menu_content(props) {
       lunch: props.lunch || [],
       dinner: props.dinner || [],
     });
-  }, [props.breakfast, props.lunch, props.dinner]);
+
+    setTimeData({
+    btime_s: props.timeData.btime_s || '',
+    ltime_s: props.timeData.ltime_s || '',
+    dtime_s: props.timeData.dtime_s || '',
+    btime_e: props.timeData.btime_e || '',
+    ltime_e: props.timeData.ltime_e || '',
+    dtime_e: props.timeData.dtime_e || '',
+  });
+  }, [props.breakfast, props.lunch, props.dinner, props.timeData]);
 
   // Define all possible categories for each meal
   const allCategories = {
     Breakfast: ["Dish", "Breads and Rice", "Others"],
     Lunch: ["Dish", "Breads and Rice", "Others"],
     Dinner: ["Dish", "Breads and Rice", "Others"],
+  };
+
+
+  // Function to update meal times via API
+  const updateMealTimes = async (updatedTimes, mealType) => {
+    try {
+      const response = await axios.post(
+        `${API_BASE_URL}/mess/menu/time/update`,
+        {
+          messId: messId,
+          type: mealType,
+          day: props.day,
+          ...updatedTimes,
+        },
+        {
+          withCredentials: true,
+        }
+      );
+
+      console.log("Times updated successfully:", response.data);
+      // if (props.onSuccessfulTimeUpdate) {
+      //   props.onSuccessfulTimeUpdate();
+      // }
+      return response.data;
+    } catch (error) {
+      console.error("Error updating meal times:", error);
+      throw error;
+    }
+  };
+
+  // Function to handle time editing
+  const handleEditTime = (mealType) => {
+    const timeKeys = getTimeKeys(mealType);
+    setEditingTime(mealType);
+    setTempTimeData({
+      startTime: timeData[timeKeys.start],
+      endTime: timeData[timeKeys.end]
+    });
+    setShowDropdown(null);
+  };
+
+  // Function to save time changes
+  const handleSaveTime = async (mealType) => {
+    const timeKeys = getTimeKeys(mealType);
+    
+    try {
+      const updatedTimes = {
+        [timeKeys.start]: tempTimeData.startTime,
+        [timeKeys.end]: tempTimeData.endTime
+      };
+
+      await updateMealTimes(updatedTimes, mealType);
+      
+      setTimeData(prev => ({
+        ...prev,
+        ...updatedTimes
+      }));
+      
+      setEditingTime(null);
+      setTempTimeData({});
+    } catch (error) {
+      alert("Error saving time. Please try again.");
+      console.error("Time save error:", error);
+    }
+  };
+
+  // Function to cancel time editing
+  const handleCancelTimeEdit = () => {
+    setEditingTime(null);
+    setTempTimeData({});
+  };
+
+  // Helper function to get time keys based on meal type
+  const getTimeKeys = (mealType) => {
+    switch (mealType) {
+      case 'Breakfast':
+        return { start: 'btime_s', end: 'btime_e' };
+      case 'Lunch':
+        return { start: 'ltime_s', end: 'ltime_e' };
+      case 'Dinner':
+        return { start: 'dtime_s', end: 'dtime_e' };
+      default:
+        return { start: '', end: '' };
+    }
   };
 
   // Function to create new item via API
@@ -292,18 +405,85 @@ function Menu_content(props) {
     }
   };
 
-  const renderMenuSection = (title, items) => {
+  const renderMenuSection = (title, items, stime, etime) => {
     const groupedItems = groupItemsByCategory(items, title);
     const colors = getSectionColors(title);
 
     return (
       <div className="mb-8">
         <div className={`${colors.bg} ${colors.border} border rounded-lg p-6`}>
+          <div className="mb-6">
           <h3
             className={`${colors.title} text-2xl font-bold mb-6 text-center border-b ${colors.border} pb-2`}
           >
-            {title}
+            {title}<br/>
+            {/* <span className="text-base">{stime}-{etime}</span> */}
           </h3>
+
+          {editingTime === title ? (
+              <div className="mt-4 bg-white rounded-lg p-4 border border-gray-200">
+                <div className="space-y-3">
+                  <div className="flex items-center space-x-2">
+                    <label className="text-sm font-medium text-gray-700 w-20">Start:</label>
+                    <input
+                      type="time"
+                      value={tempTimeData.startTime}
+                      onChange={(e) => setTempTimeData(prev => ({...prev, startTime: e.target.value}))}
+                      className="px-3 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <label className="text-sm font-medium text-gray-700 w-20">End:</label>
+                    <input
+                      type="time"
+                      value={tempTimeData.endTime}
+                      onChange={(e) => setTempTimeData(prev => ({...prev, endTime: e.target.value}))}
+                      className="px-3 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
+                  <div className="flex space-x-2 pt-2">
+                    <button
+                      className="px-3 py-1 bg-green-500 hover:bg-green-600 text-white text-sm rounded-md transition-colors duration-200"
+                       onClick={() => handleSaveTime(title)}
+                    >
+                      Save
+                    </button>
+                    <button
+                      className="px-3 py-1 bg-gray-500 hover:bg-gray-600 text-white text-sm rounded-md transition-colors duration-200"
+                       onClick={handleCancelTimeEdit}
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="mt-4 text-center">
+                <div className="flex items-center justify-center space-x-2">
+                  <span className="text-base font-medium text-gray-700">
+                    {stime} - {etime}
+                  </span>
+                  <button
+                     onClick={() => handleEditTime(title)}
+                    className="p-1 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors duration-200"
+                    title="Edit time"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="14"
+                      height="14"
+                      fill="currentColor"
+                      viewBox="0 0 16 16"
+                    >
+                      <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708L14.5 5.207l-8 8L6 14H4a.5.5 0 0 1-.5-.5v-2l8-8L12.146.146zM13 1.854L12.146 1 11 2.146 12.854 4 14 2.854 13 1.854zM10.5 3.5L11.354 4.354 3.854 11.854 3 11v-.854l7.5-7.5z"/>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            )}
+
+          </div>
+          
 
           <div className="space-y-6">
             {Object.entries(groupedItems).map(([category, categoryItems]) => (
@@ -313,7 +493,7 @@ function Menu_content(props) {
               >
                 <div className="flex justify-between items-center mb-4">
                   <span className={`${colors.accent} text-lg font-semibold`}>
-                    {category}
+                    {category} 
                   </span>
                   <button
                     className="flex items-center justify-center w-8 h-8 bg-green-100 hover:bg-green-200 text-green-600 rounded-full transition-colors duration-200"
@@ -441,13 +621,13 @@ function Menu_content(props) {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-1">
-          {renderMenuSection("Breakfast", menuData.breakfast)}
+          {renderMenuSection("Breakfast", menuData.breakfast, timeData.btime_s, timeData.btime_e)}
         </div>
         <div className="lg:col-span-1">
-          {renderMenuSection("Lunch", menuData.lunch)}
+          {renderMenuSection("Lunch", menuData.lunch, timeData.ltime_s, timeData.ltime_e)}
         </div>
         <div className="lg:col-span-1">
-          {renderMenuSection("Dinner", menuData.dinner)}
+          {renderMenuSection("Dinner", menuData.dinner, timeData.dtime_s, timeData.dtime_e)}
         </div>
       </div>
     </div>

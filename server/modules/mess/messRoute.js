@@ -21,9 +21,10 @@ const {
   getUnassignedMess,
   assignMessToHostel,
   changeHostel,
-  unassignMess
+  unassignMess,
+  
 } = require("./messController");
-const { getMessMenuByDayForAdmin, modifyMenuItem } = require("./messAdminController.js");
+const { getMessMenuByDayForAdmin, modifyMenuItem,updateTime } = require("./messAdminController.js");
 
 const messRouter = express.Router();
 
@@ -55,4 +56,5 @@ messRouter.post("/unassign/:messId", unassignMess);
 //for admin
 messRouter.post("/menu/admin/:messId", authenticateAdminJWT,getMessMenuByDayForAdmin);
 messRouter.post("/menu/modify/:messId", authenticateAdminJWT,modifyMenuItem);
+messRouter.post("/menu/time/update", authenticateAdminJWT, updateTime);
 module.exports = messRouter;

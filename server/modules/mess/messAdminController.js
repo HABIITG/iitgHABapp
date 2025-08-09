@@ -53,6 +53,7 @@ const modifyMenuItem = async (req, res) => {
   try {
     const _Id = req.body._Id;
     const name = req.body.name;
+
    // const hostelId = req.user.id; //use hostelID
 
     const menuItem = await MenuItem.findById(_Id);
@@ -72,7 +73,56 @@ const modifyMenuItem = async (req, res) => {
   }
 };
 
+const updateTime = async(req,res)=>{
+  try{
+    const messId = req.body.messId;
+    const type = req.body.type;
+    const day = req.body.day;
+
+    if (!messId || !day) {
+      return res.status(400).json({ message: "Mess ID and day are required" });
+    }
+
+    var start;
+    var end;
+
+    if(type==='Breakfast'){
+      start = req.body.btime_s;
+      end = req.body.btime_e;
+    }
+    else if(type==='lunch'){
+      start = req.body.ltime_s;
+      end = req.body.ltime_e;
+    }
+    else if(type==='Dinner'){
+      start = req.body.dtime_s;
+      end = req.body.dtime_e;
+    }
+    else{}
+
+    const menu = await Menu.findOne({messId: messId, day: day});
+    if (!menu || menu.length === 0) {
+      return res.status(200).json("DoesntExist");
+    }
+
+    menu.startTime = start;
+    menu.endTime = end;
+
+    await menu.save();
+
+    return res
+      .status(200)
+      .json({ message: "Menu timing updated successfully", menu });
+
+  }
+  catch(error){
+    console.error(error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+}
+
 module.exports = {
   modifyMenuItem, //to modify menu item
-  getMessMenuByDayForAdmin
+  getMessMenuByDayForAdmin,
+  updateTime,
 };

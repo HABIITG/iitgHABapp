@@ -29,6 +29,32 @@ export const Dashboard = () => {
     lunch: [],
     dinner: [],
   });
+  const [timings, setTimings] = useState({
+    btime_s: '',
+    ltime_s: '',
+    dtime_s: '',
+    btime_e: '',
+    ltime_e: '',
+    dtime_e: '',
+  });
+
+  const isActive = (stime, etime) => {
+    const now = new Date();
+
+    const [shours, sminutes] = stime.split(":").map(Number);
+    const [ehours, eminutes] = etime.split(":").map(Number);
+    const s_time = new Date(now);
+    s_time.setHours(shours, sminutes, 0, 0);
+    const e_time = new Date(now);
+    e_time.setHours(ehours, eminutes, 0, 0);
+
+    console.log(s_time);
+
+    if (now >= s_time && now < e_time) return true;
+    else return false;
+
+  }
+
   const [activeTab, setActiveTab] = useState(() => {
     let initialDay = new Date().getDay();
     return initialDay === 0 ? 6 : initialDay - 1;
@@ -78,8 +104,19 @@ export const Dashboard = () => {
           id: response.data._id, // Store the menu ID for later use
         };
 
+        const timeData = {
+          btime_s: '',
+          ltime_s: '',
+          dtime_s: '',
+          btime_e: '',
+          ltime_e: '',
+          dtime_e: '',
+        };
+
         response.data.forEach((element) => {
           if (element.type === "Breakfast") {
+            timeData.btime_s = element.startTime;
+            timeData.btime_e = element.endTime;
             element.items.forEach((item) => {
               menuData.breakfast.push({
                 id: item._id,
@@ -88,6 +125,8 @@ export const Dashboard = () => {
               });
             });
           } else if (element.type === "Lunch") {
+            timeData.ltime_s = element.startTime;
+            timeData.ltime_e = element.endTime;
             element.items.forEach((item) => {
               menuData.lunch.push({
                 id: item._id,
@@ -96,6 +135,8 @@ export const Dashboard = () => {
               });
             });
           } else if (element.type === "Dinner") {
+            timeData.dtime_s = element.startTime;
+            timeData.dtime_e = element.endTime;
             element.items.forEach((item) => {
               menuData.dinner.push({
                 id: item._id,
@@ -108,6 +149,8 @@ export const Dashboard = () => {
 
         console.log("Setting menu for", days[activeTab], menuData);
         setCurrentMenu(menuData);
+        console.log("timeData", timeData);
+        setTimings(timeData);
       }
     } catch (error) {
       console.error("Error fetching menu:", error);
@@ -165,22 +208,20 @@ export const Dashboard = () => {
         <div className="flex">
           <button
             onClick={() => setCurrentPage('menu')}
-            className={`flex items-center gap-2 px-6 py-4 text-sm font-medium border-b-2 transition-colors duration-200 ${
-              currentPage === 'menu'
+            className={`flex items-center gap-2 px-6 py-4 text-sm font-medium border-b-2 transition-colors duration-200 ${currentPage === 'menu'
                 ? "text-blue-600 border-blue-600 bg-blue-50"
                 : "text-gray-500 border-transparent hover:text-gray-700 hover:border-gray-300"
-            }`}
+              }`}
           >
             <Menu className="w-4 h-4" />
             Menu Management
           </button>
           <button
             onClick={() => setCurrentPage('requests')}
-            className={`flex items-center gap-2 px-6 py-4 text-sm font-medium border-b-2 transition-colors duration-200 ${
-              currentPage === 'requests'
+            className={`flex items-center gap-2 px-6 py-4 text-sm font-medium border-b-2 transition-colors duration-200 ${currentPage === 'requests'
                 ? "text-blue-600 border-blue-600 bg-blue-50"
                 : "text-gray-500 border-transparent hover:text-gray-700 hover:border-gray-300"
-            }`}
+              }`}
           >
             <Users className="w-4 h-4" />
             Change Requests
@@ -191,105 +232,134 @@ export const Dashboard = () => {
         </div>
       </div>
 
-      
-      {currentPage==='menu' ? (
+
+      {currentPage === 'menu' ? (
         // Menu Section
-      <div className=" mx-auto">
-        {/* Menu Page Header */}
-        <div className="bg-blue-600 text-white p-6">
-          <div className="flex justify-between items-center">
-            <h1 className="text-xl font-semibold">HMC - Menu page</h1>
-            <span className="bg-green-500 text-white px-3 py-1 rounded-full text-sm font-medium">
-              Active
-            </span>
-          </div>
-        </div>
+        <div className=" mx-auto">
+          {/* Menu Page Header */}
+          <div className="bg-blue-600 text-white p-6">
+            <div className="flex justify-between items-center">
+              <h1 className="text-xl font-semibold">HMC - Menu page</h1>
+              {/* <span className="bg-green-500 text-white px-3 py-1 rounded-full text-sm font-medium">
+              {(isActive(timeData.btime_s, timeData.btime_e) || isActive(timeData.ltime_s, timeData.ltime_e) || isActive(timeData.dtime_s, timeData.dtime_e))? 'Active':'Inactive' }
+            </span> */}
 
-        {/* Day Tabs */}
-        <div className="bg-white border-b border-gray-200 overflow-x-auto">
-          <div className="flex justify-between min-w-full items-center">
-            <div>
-            {days.map((day, index) => (
-              <button
-                key={day}
-                className={`px-6 py-4 text-sm font-medium border-b-2 transition-colors duration-200 whitespace-nowrap min-w-[120px] ${
-                  activeTab === index
-                    ? "text-blue-600 border-blue-600 bg-blue-50"
-                    : "text-gray-500 border-transparent hover:text-gray-700 hover:border-gray-300"
-                }`}
-                onClick={() => setActiveTab(index)}
-              >
-                {day}
-              </button>
-            ))}
-            </div>
-
-            <button className="mr-5 bg-blue-500 text-white px-3 py-1 rounded-full text-sm font-medium h-8">Download</button>
-          </div>
-        </div>
-
-        {/* Main Content Area */}
-        <div className="bg-white min-h-[600px]">
-          {/* Current Day Header */}
-          <div className="text-center py-6 border-b border-gray-100">
-            <h2 className="text-3xl font-bold text-blue-600">
-              {days[activeTab]} Menu
-            </h2>
-          </div>
-
-          {/* Conditional Content Rendering */}
-          {showCreateMenu ? (
-            <div className="p-6">
-              <CreateMenuFallback
-                onSuccessfulCreation={handleSuccessfulMenuCreation}
-              />
-            </div>
-          ) : (
-            <div>
-              {/* Loading State */}
-              {isLoading ? (
-                <div className="flex items-center justify-center py-12">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-                  <span className="ml-3 text-gray-600 text-lg">
-                    Loading menu...
-                  </span>
-                </div>
-              ) : (
-                <Menu_content
-                  key={activeTab}
-                  day={days[activeTab]}
-                  breakfast={currentMenu.breakfast}
-                  lunch={currentMenu.lunch}
-                  dinner={currentMenu.dinner}
-                  messId={user.messId._id}
-                  onSuccessfulItemCreation={handleSuccessfulMenuItemCreation}
-                  click={handleGoToCreateMenu}
-                />
+              {timings.btime_s && timings.btime_e && timings.ltime_s && timings.ltime_e && timings.dtime_s && timings.dtime_e && (
+                <>
+                    {isActive(timings.btime_s, timings.btime_e) && 
+                    (
+                    <span className="bg-green-500 text-white px-3 py-1 rounded-full text-sm font-medium">
+                      Breakfast
+                      </span>
+                    )}
+                    {isActive(timings.ltime_s, timings.ltime_e) && (
+                      <span className="bg-green-500 text-white px-3 py-1 rounded-full text-sm font-medium">
+                      Lunch
+                      </span>
+                    )}
+                    {isActive(timings.dtime_s, timings.dtime_e) && (
+                      <span className="bg-green-500 text-white px-3 py-1 rounded-full text-sm font-medium">
+                      Dinner
+                      </span>
+                    )}
+                
+                
+                    {!isActive(timings.btime_s, timings.btime_e) && !isActive(timings.ltime_s, timings.ltime_e)&& !isActive(timings.dtime_s, timings.dtime_e)&&(
+                      <span className="bg-red-500 text-white px-3 py-1 rounded-full text-sm font-medium">Closed</span>
+                    )
+                  }
+                    
+                
+                </>
               )}
             </div>
-          )}
-        </div>
-      </div>
-      ):(
-        <>
-          {/* Requests Page Header */}
-            <div className="bg-green-600 text-white p-6">
-              <div className="flex justify-between items-center">
-                <h1 className="text-xl font-semibold">HMC - Requests Management</h1>
-                {/* <span className="bg-blue-500 text-white px-3 py-1 rounded-full text-sm font-medium">
-                  {mockRequests.filter(r => r.status === 'pending').length} Pending
-                </span> */}
+          </div>
+
+          {/* Day Tabs */}
+          <div className="bg-white border-b border-gray-200 overflow-x-auto">
+            <div className="flex justify-between min-w-full items-center">
+              <div>
+                {days.map((day, index) => (
+                  <button
+                    key={day}
+                    className={`px-6 py-4 text-sm font-medium border-b-2 transition-colors duration-200 whitespace-nowrap min-w-[120px] ${activeTab === index
+                        ? "text-blue-600 border-blue-600 bg-blue-50"
+                        : "text-gray-500 border-transparent hover:text-gray-700 hover:border-gray-300"
+                      }`}
+                    onClick={() => setActiveTab(index)}
+                  >
+                    {day}
+                  </button>
+                ))}
               </div>
+
+              <button className="mr-5 bg-blue-500 text-white px-3 py-1 rounded-full text-sm font-medium h-8">Download</button>
+            </div>
+          </div>
+
+          {/* Main Content Area */}
+          <div className="bg-white min-h-[600px]">
+            {/* Current Day Header */}
+            <div className="text-center py-6 border-b border-gray-100">
+              <h2 className="text-3xl font-bold text-blue-600">
+                {days[activeTab]} Menu
+              </h2>
             </div>
 
-            {/* Requests Content */}
-            <div className="bg-white min-h-[600px]">
-              <RequestsContent hostelId={user._id} />
+            {/* Conditional Content Rendering */}
+            {showCreateMenu ? (
+              <div className="p-6">
+                <CreateMenuFallback
+                  onSuccessfulCreation={handleSuccessfulMenuCreation}
+                />
+              </div>
+            ) : (
+              <div>
+                {/* Loading State */}
+                {isLoading ? (
+                  <div className="flex items-center justify-center py-12">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                    <span className="ml-3 text-gray-600 text-lg">
+                      Loading menu...
+                    </span>
+                  </div>
+                ) : (
+                  <Menu_content
+                    key={activeTab}
+                    day={days[activeTab]}
+                    breakfast={currentMenu.breakfast}
+                    lunch={currentMenu.lunch}
+                    dinner={currentMenu.dinner}
+                    messId={user.messId._id}
+                    timeData={timings}
+                    onSuccessfulItemCreation={handleSuccessfulMenuItemCreation}
+                    click={handleGoToCreateMenu}
+                  />
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+      ) : (
+        <>
+          {/* Requests Page Header */}
+          <div className="bg-green-600 text-white p-6">
+            <div className="flex justify-between items-center">
+              <h1 className="text-xl font-semibold">HMC - Requests Management</h1>
+              {/* <span className="bg-blue-500 text-white px-3 py-1 rounded-full text-sm font-medium">
+                  {mockRequests.filter(r => r.status === 'pending').length} Pending
+                </span> */}
             </div>
+          </div>
+
+          {/* Requests Content */}
+          <div className="bg-white min-h-[600px]">
+            <RequestsContent hostelId={user._id} />
+          </div>
         </>
       )}
 
-      
+
     </div>
   );
 };
