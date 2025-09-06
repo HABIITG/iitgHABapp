@@ -13,6 +13,7 @@ import 'package:frontend1/utilities/startupitem.dart';
 import 'package:provider/provider.dart';
 import 'package:frontend1/utilities/notifications.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:frontend1/utilities/Notifier.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -20,6 +21,8 @@ Future<void> main() async {
   await Firebase.initializeApp();
 
   await getUserMessInfo();
+
+  NotificationNotifier.init();
 
   runApp(
     MultiProvider(
