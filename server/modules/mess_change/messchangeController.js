@@ -2,6 +2,7 @@ const { User } = require("../user/userModel.js");
 const { Hostel } = require("../hostel/hostelModel.js");
 const { MessChange } = require("./messChangeModel.js");
 const { MessChangeSettings } = require("./messChangeSettingsModel.js");
+const { sendCustomNotificationToAllUsers } = require("../notification/notificationManager.js");
 
 const getAllMessChangeRequestsForAllHostels = async (req, res) => {
   try {
@@ -171,6 +172,8 @@ const rejectAllMessChangeRequests = async (req, res) => {
 
     await updateLastProcessedTimestamp();
 
+    sendCustomNotificationToAllUsers("Mess Change is Disabled", "Mess Change is Disabled");
+
     return res.status(200).json({
       message: `Rejected ${users.length} pending requests. Mess change has been automatically disabled.`,
     });
@@ -222,6 +225,8 @@ const processAllMessChangeRequests = async (req, res) => {
 
     // Automatically disable mess change after processing and update timestamp
     await updateLastProcessedTimestamp();
+
+    sendCustomNotificationToAllUsers("Mess Change is Disabled", "Mess Change is Disabled");
 
     return res.status(200).json({
       message: `${acceptedUsers.length} requests accepted, ${rejectedUsers.length} rejected. Mess change has been automatically disabled.`,
@@ -388,6 +393,9 @@ const enableMessChange = async (req, res) => {
     }
 
     await settings.save();
+    
+    sendCustomNotificationToAllUsers("Mess Change is Enabled", "Mess Change is Enabled");
+
 
     return res.status(200).json({
       message: "Mess change enabled successfully",
@@ -414,6 +422,8 @@ const disableMessChange = async (req, res) => {
     settings.disabledAt = new Date();
 
     await settings.save();
+
+    sendCustomNotificationToAllUsers("Mess Change is Disabled", "Mess Change is Disabled");
 
     return res.status(200).json({
       message: "Mess change disabled successfully",
@@ -470,8 +480,8 @@ const getMessChangeScheduleInfo = async (req, res) => {
     const settings = await MessChangeSettings.findOne();
 
     // FOR TESTING: Fixed test dates
-    const testEnableDate = new Date("2025-09-07T02:15:00+05:30");
-    const testDisableDate = new Date("2025-09-07T02:30:00+05:30");
+    const testEnableDate = new Date("2025-09-07T02:48:00+05:30");
+    const testDisableDate = new Date("2025-09-07T04:30:00+05:30");
 
     return res.status(200).json({
       message: "Mess change schedule information (TEST MODE)",
@@ -518,6 +528,9 @@ const enableMessChangeAutomatic = async () => {
     }
 
     await settings.save();
+
+    sendCustomNotificationToAllUsers("Enable", "Mess Change is Enabled");
+    
     console.log("✅ Mess change enabled automatically");
     return { success: true, settings };
   } catch (error) {
@@ -526,27 +539,6 @@ const enableMessChangeAutomatic = async () => {
   }
 };
 
-// Disable mess change function for automatic scheduling (no HTTP response)
-const disableMessChangeAutomatic = async () => {
-  try {
-    let settings = await MessChangeSettings.findOne();
-
-    if (!settings) {
-      console.log("⚠️ No mess change settings found - nothing to disable");
-      return { success: false, message: "No settings found" };
-    }
-
-    settings.isEnabled = false;
-    settings.disabledAt = new Date();
-
-    await settings.save();
-    console.log("✅ Mess change disabled automatically");
-    return { success: true, settings };
-  } catch (error) {
-    console.error("❌ Error disabling mess change automatically:", error);
-    return { success: false, error };
-  }
-};
 
 module.exports = {
   getAllMessChangeRequestsForAllHostels,
@@ -562,5 +554,4 @@ module.exports = {
   rejectAllMessChangeRequests,
   getMessChangeScheduleInfo,
   enableMessChangeAutomatic,
-  disableMessChangeAutomatic,
 };

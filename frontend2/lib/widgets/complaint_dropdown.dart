@@ -36,7 +36,7 @@ class _ComplaintsCardState extends State<ComplaintsCard> {
       FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
           setState(() {
             num_notification += 1;
-            //storedNotifications = stored;
+            // storedNotifications = stored;
           });
         });
       }

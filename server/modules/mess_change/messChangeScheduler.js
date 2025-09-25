@@ -17,7 +17,7 @@ const initializeMessChangeScheduler = () => {
   console.log("🌏 Current IST time:", istTime.toLocaleString("en-IN"));
 
   // TEST SCHEDULE - Enable at 2:15 AM IST on 7 Sept 2025
-  const testEnableDate = new Date("2025-09-07T02:34:40+05:30");
+  const testEnableDate = new Date("2025-09-07T03:22:00+05:30");
   const enableJob = schedule.scheduleJob(
     "mess-change-enable",
     testEnableDate,
@@ -31,7 +31,7 @@ const initializeMessChangeScheduler = () => {
   );
 
   // TEST SCHEDULE - Disable at 2:30 AM IST on 7 Sept 2025
-  const testDisableDate = new Date("2025-09-07T02:35:00+05:30");
+  const testDisableDate = new Date("2025-09-07T03:23:00+05:30");
   const disableJob = schedule.scheduleJob(
     "mess-change-disable",
     testDisableDate,
