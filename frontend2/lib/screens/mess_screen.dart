@@ -200,7 +200,8 @@ class _MenuSectionState extends State<_MenuSection> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          FeedbackCard(),
+          if (DateTime.now().day >= 27)
+            FeedbackCard(),
           const SizedBox(height: 24),
           Row(
             children: [

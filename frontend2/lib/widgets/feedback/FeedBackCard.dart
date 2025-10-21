@@ -24,11 +24,11 @@ class _FeedbackCardState extends State<FeedbackCard> {
           const Text("You can help the mess team serve better meals.",
               style: TextStyle(color: Colors.black54)),
           const SizedBox(height: 8),
-          const Row(
+          Row(
             children: [
               Icon(Icons.access_time, color: Colors.red, size: 18),
               SizedBox(width: 4),
-              Text('Form closes in 2 Days',
+              Text('Form closes in ${DateTime.now().day - DateTime(DateTime.now().year, DateTime.now().month + 1, 1).subtract(Duration(days: 1)).day} Days',
                   style: TextStyle(color: Colors.red, fontWeight: FontWeight.w500)),
             ],
           ),
