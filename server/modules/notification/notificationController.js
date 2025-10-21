@@ -2,6 +2,7 @@ const admin = require("./firebase.js");
 const Notification = require("./notificationModel.js");
 const FCMToken = require("./FCMToken.js");
 const User = require("../user/userModel.js");
+const { Hostel } = require("../hostel/hostelModel.js");
 
 // Register (or update) FCM token for a user
 const registerToken = async (req, res) => {
@@ -9,15 +10,25 @@ const registerToken = async (req, res) => {
     if (!req.user)
       return res.status(403).json({ error: "Only users can register tokens" });
 
+    const curr_sub_mess_name = (await Hostel.findById((await req.user.curr_subscribed_mess)._id))['hostel_name'].replaceAll(' ', '_');
+
+    console.log(curr_sub_mess_name);
+
+    
     const { fcmToken } = req.body;
     if (!fcmToken)
       return res.status(400).json({ error: "FCM token is required" });
+    
+    admin.messaging().subscribeToTopic(fcmToken, "All_Hostels");
+    admin.messaging().subscribeToTopic(fcmToken, curr_sub_mess_name);
 
     await FCMToken.findOneAndUpdate(
       { user: req.user._id },
       { token: fcmToken },
       { upsert: true, new: true, setDefaultsOnInsert: true }
     );
+
+    
 
     res.json({ message: "FCM token registered" });
   } catch (err) {
@@ -34,27 +45,27 @@ const sendNotification = async (req, res) => {
     //     .status(403)
     //     .json({ error: "Only hostel admins can send notifications" });
 
-    const { title, body } = req.body;
+    const { title, body, topic } = req.body;
     // const users = await User.find({ hostel: req.hostel._id });
     // const userIds = users.map((u) => u._id);
 
     // const tokens = await FCMToken.find({ user: { $in: userIds } });
-    const fcmTokens = (await FCMToken.find({})).map((t) => t.token);
+    // const fcmTokens = (await FCMToken.find({})).map((t) => t.token);
 
-    console.log(fcmTokens);
+    // console.log(fcmTokens);
     // const fcmTokens = ["fKlOwXuIQlKoXNmz3Azir3:APA91bEgK2VmDUasiIJT0Rpmb9emp-aYmuO5w-arzpeaAs9QMK_B9AT8iQlNDPXBm0tLb2wVQHDogj3XmaTn76YORG0iVBZ4zgf1DUMSY7DTfaYLdYZL6LA"];
 
-    if (fcmTokens.length === 0)
-      return res.status(400).json({ error: "No user tokens found" });
+    // if (fcmTokens.length === 0)
+    //   return res.status(400).json({ error: "No user tokens found" });
 
     const message = {
       notification: { title, body },
-      tokens: fcmTokens,
+      topic: topic
     };
 
     console.log(message);
 
-    await admin.messaging().sendEachForMulticast(message);
+    await admin.messaging().send(message);
 
     // await Notification.create({
     //   title,

@@ -15,6 +15,7 @@ import 'package:frontend2/utilities/startupitem.dart';
 import 'package:provider/provider.dart';
 import 'package:frontend2/utilities/notifications.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:frontend2/utilities/Notifier.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -25,6 +26,8 @@ Future<void> main() async {
   ProfilePictureProvider.init();
 
   await getUserMessInfo();
+
+  NotificationNotifier.init();
 
   runApp(
     MultiProvider(
