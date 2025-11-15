@@ -5,16 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9f22e541-6f34-44ad-b768-3e17d6476ce7" name="Changes" comment="Mess Preference fully done">
-      <change afterPath="$PROJECT_DIR$/frontend2/ios/build/XCBuildData/d85f9b72d26b2debe44eb7a0e35290e9.xcbuilddata/build-request.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend2/ios/build/XCBuildData/d85f9b72d26b2debe44eb7a0e35290e9.xcbuilddata/description.msgpack" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend2/ios/build/XCBuildData/d85f9b72d26b2debe44eb7a0e35290e9.xcbuilddata/manifest.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend2/ios/build/XCBuildData/d85f9b72d26b2debe44eb7a0e35290e9.xcbuilddata/target-graph.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend2/ios/build/XCBuildData/d85f9b72d26b2debe44eb7a0e35290e9.xcbuilddata/task-store.msgpack" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Dart_Packages.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/libraries/Dart_Packages.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/other.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/other.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend2/ios/Runner.xcodeproj/project.pbxproj" beforeDir="false" afterPath="$PROJECT_DIR$/frontend2/ios/Runner.xcodeproj/project.pbxproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend2/lib/main.dart" beforeDir="false" afterPath="$PROJECT_DIR$/frontend2/lib/main.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend2/lib/screen1/home_screen1.dart" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend2/lib/screen1/qr_scanner.dart" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend2/pubspec.lock" beforeDir="false" afterPath="$PROJECT_DIR$/frontend2/pubspec.lock" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
