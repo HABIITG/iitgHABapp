@@ -50,7 +50,7 @@ export const getMessSubscribersByHostelId = async (hostelId) => {
 export const createHostel = async (hostelData) => {
   try {
     const response = await axios.post(
-      `${BACKEND_URL}/hostel/create`,
+      `${BACKEND_URL}/hostel/`,
       hostelData
     );
     return response.data;
