@@ -125,9 +125,40 @@ const sendNotification = async (req, res) => {
   }
 };
 
+// Send welcome notification to the authenticated user
+// Called from frontend after FCM token registration
+const sendWelcomeNotification = async (req, res) => {
+  try {
+    if (!req.user) {
+      return res.status(403).json({ error: "Authentication required" });
+    }
+
+    // Check if user already has FCM token registered
+    const tokenDoc = await FCMToken.findOne({ user: req.user._id });
+    if (!tokenDoc || !tokenDoc.token) {
+      return res.status(400).json({
+        error: "FCM token not registered yet. Please register token first.",
+      });
+    }
+
+    // Send welcome notification
+    await sendNotificationToUser(
+      req.user._id,
+      "Welcome to HAB App",
+      "Thanks for signing in! You will receive updates here."
+    );
+
+    res.status(200).json({ message: "Welcome notification sent" });
+  } catch (err) {
+    console.error("Error sending welcome notification:", err);
+    res.status(500).json({ error: "Failed to send welcome notification" });
+  }
+};
+
 module.exports = {
   registerToken,
   sendNotification,
   sendNotificationMessage,
   sendNotificationToUser,
+  sendWelcomeNotification,
 };

@@ -371,8 +371,12 @@ void _onNotificationTap(NotificationResponse response) {
 Future<void> registerFcmToken() async {
   try {
     final header = await getAccessToken();
-    debugPrint('Access token: 😊😊😊😊😊😊😊😊😊😊😊😊😊😊😊😊😊😊😊😊😊');
-    debugPrint('1');
+
+    // Return early if user is not authenticated
+    if (header == 'error') {
+      debugPrint('⚠️ Cannot register FCM token: User not authenticated');
+      return;
+    }
 
     // On iOS, we need to request permission first, then wait for APNS token before getting FCM token
     if (Platform.isIOS) {
@@ -415,17 +419,21 @@ Future<void> registerFcmToken() async {
     }
 
     final dio = DioClient().dio;
-    debugPrint('2');
-    debugPrint('Header Token: $header');
-    debugPrint('Uri: ${Uri.parse(NotificationEndpoints.registerToken)}');
 
     // ✅ Listen for token refresh events and re-register
     FirebaseMessaging.instance.onTokenRefresh.listen((fcmToken) async {
+      // Get fresh access token for each refresh
+      final freshHeader = await getAccessToken();
+      if (freshHeader == 'error') {
+        debugPrint('⚠️ Cannot re-register FCM token: User not authenticated');
+        return;
+      }
+
       final res = await dio.post(
         NotificationEndpoints.registerToken,
         options: Options(
           headers: {
-            'Authorization': 'Bearer $header',
+            'Authorization': 'Bearer $freshHeader',
             'Content-Type': 'application/json',
           },
         ),
@@ -455,12 +463,47 @@ Future<void> registerFcmToken() async {
     debugPrint('3');
     if (res.statusCode == 200) {
       debugPrint('✅ FCM token registered: $token');
+
+      // Send welcome notification after successful token registration
+      // This ensures the FCM token exists before sending
+      await _sendWelcomeNotificationIfNeeded(header);
     } else {
       debugPrint('❌ Failed to register token');
     }
   } catch (e) {
     debugPrint('4');
     debugPrint('❌ Error registering FCM token: $e');
+  }
+}
+
+// Send welcome notification if user hasn't received it yet
+Future<void> _sendWelcomeNotificationIfNeeded(String authToken) async {
+  try {
+    final prefs = await SharedPreferences.getInstance();
+    final welcomeSent = prefs.getBool('welcome_notification_sent') ?? false;
+
+    // Only send if not already sent
+    if (!welcomeSent) {
+      final dio = DioClient().dio;
+      final res = await dio.post(
+        NotificationEndpoints.welcome,
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $authToken',
+            'Content-Type': 'application/json',
+          },
+        ),
+      );
+
+      if (res.statusCode == 200) {
+        // Mark as sent to avoid duplicate notifications
+        await prefs.setBool('welcome_notification_sent', true);
+        debugPrint('✅ Welcome notification sent');
+      }
+    }
+  } catch (e) {
+    // Silently fail - welcome notification is not critical
+    debugPrint('⚠️ Failed to send welcome notification: $e');
   }
 }
 

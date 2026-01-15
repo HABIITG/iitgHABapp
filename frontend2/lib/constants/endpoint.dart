@@ -3,6 +3,7 @@ const String authUrl = "https://hab.codingclub.in/api";
 
 class NotificationEndpoints {
   static const String registerToken = '$baseUrl/notification/register-token';
+  static const String welcome = '$baseUrl/notification/welcome';
 }
 
 class MessChange {

@@ -32,6 +32,18 @@ const getHostelAlloc = async (rollno) => {
   }
 };
 
+const getCurrentSubscribedMess = async (rollno) => {
+  try {
+    const allocation = await UserAllocHostel.findOne({ rollno }).populate(
+      "current_subscribed_mess"
+    );
+    return allocation?.current_subscribed_mess || null;
+  } catch (err) {
+    console.error("Error fetching current subscribed mess:", err);
+    return null;
+  }
+};
+
 // Mobile redirect (used by app deep link)
 const mobileRedirectHandler = async (req, res, next) => {
   try {
@@ -72,11 +84,13 @@ const mobileRedirectHandler = async (req, res, next) => {
         "Hostel allocation not found for this roll number"
       );
 
+    const currentSubscribedMess = await getCurrentSubscribedMess(roll);
+    // currentSubscribedMess is optional - if not found, User model will default to hostel
+
     let existingUser = await findUserWithEmail(userFromToken.data.mail);
-    let isFirstLogin = false;
 
     if (!existingUser) {
-      const user = new User({
+      const userData = {
         name: userFromToken.data.displayName,
         degree: userFromToken.data.jobTitle,
         rollNumber: roll,
@@ -84,7 +98,14 @@ const mobileRedirectHandler = async (req, res, next) => {
         hostel: allocatedHostel._id,
         authProvider: "microsoft",
         hasMicrosoftLinked: true, // Microsoft login = student account (surname exists)
-      });
+      };
+
+      // Only set curr_subscribed_mess if we have it, otherwise User model will default to hostel
+      if (currentSubscribedMess) {
+        userData.curr_subscribed_mess = currentSubscribedMess._id;
+      }
+
+      const user = new User(userData);
       existingUser = await user.save();
       isFirstLogin = true;
     } else {
@@ -95,22 +116,19 @@ const mobileRedirectHandler = async (req, res, next) => {
       existingUser.hasMicrosoftLinked = true; // Always true for Microsoft login
       existingUser.authProvider =
         existingUser.authProvider === "apple" ? "both" : "microsoft";
+
+      // Update curr_subscribed_mess if we have it
+      if (currentSubscribedMess) {
+        existingUser.curr_subscribed_mess = currentSubscribedMess._id;
+      }
+
       await existingUser.save();
     }
 
     const token = existingUser.generateJWT();
 
-    if (isFirstLogin) {
-      try {
-        await sendNotificationToUser(
-          existingUser._id,
-          "Welcome to HAB App",
-          "Thanks for signing in! You will receive updates here."
-        );
-      } catch (e) {
-        console.warn("Failed to send welcome notification", e);
-      }
-    }
+    // Welcome notification is now sent from frontend after FCM token registration
+    // This ensures the FCM token exists before sending the notification
 
     return res.redirect(
       `iitghab://success?token=${token}&user=${encodeURIComponent(
@@ -422,13 +440,19 @@ const linkMicrosoftAccount = async (req, res, next) => {
       );
     }
 
+    // Get current subscribed mess if available, otherwise will default to hostel
+    const currentSubscribedMess = await getCurrentSubscribedMess(roll);
+
     // Update current user with Microsoft info
     currentUser.name = userFromToken.data.displayName || currentUser.name; // Update name from Microsoft account
     currentUser.degree = userFromToken.data.jobTitle || currentUser.degree; // Update degree from Microsoft account
     currentUser.email = microsoftEmail;
     currentUser.rollNumber = roll;
     currentUser.hostel = allocatedHostel._id;
-    currentUser.curr_subscribed_mess = allocatedHostel._id;
+    // Use current_subscribed_mess from allocation if available, otherwise default to hostel
+    currentUser.curr_subscribed_mess = currentSubscribedMess
+      ? currentSubscribedMess._id
+      : allocatedHostel._id;
     currentUser.hasMicrosoftLinked = true; // Microsoft account = student account (surname exists)
     currentUser.authProvider =
       currentUser.authProvider === "apple" ? "both" : "microsoft";
