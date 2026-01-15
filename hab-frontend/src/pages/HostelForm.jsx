@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { BACKEND_URL } from "../apis/server";
+import { createHostel } from "../apis/hostel";
+import { getUnassignedMesses } from "../apis/mess";
 
 export default function HostelForm() {
-  const server = import.meta.env.VITE_SERVER_URL;
   const navigate = useNavigate();
 
   const [hostelName, setHostelName] = useState("");
@@ -23,16 +25,7 @@ export default function HostelForm() {
     };
 
     try {
-      const response = await fetch(`${server}/api/hostel/`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(hostelData),
-      });
-
-      if (!response.ok) throw new Error("Failed to create hostel");
-
+      await createHostel(hostelData);
       navigate("/hostels");
     } catch (err) {
       console.error("Upload error:", err);
@@ -43,15 +36,8 @@ export default function HostelForm() {
   useEffect(() => {
     const fetchUnassignedMess = async () => {
       try {
-        const response = await fetch(`${server}/api/mess/unassigned`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
-        const data = await response.json();
+        const data = await getUnassignedMesses();
         setUnassignedMess(data);
-
         setMessId(data.length > 0 ? data[0]._id : "");
       } catch (error) {
         console.error("Failed to fetch unassigned mess:", error);
@@ -60,7 +46,7 @@ export default function HostelForm() {
     };
 
     fetchUnassignedMess();
-  }, [server]);
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center p-6">
