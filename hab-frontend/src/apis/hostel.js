@@ -49,10 +49,7 @@ export const getMessSubscribersByHostelId = async (hostelId) => {
 // Create new hostel
 export const createHostel = async (hostelData) => {
   try {
-    const response = await axios.post(
-      `${BACKEND_URL}/hostel/`,
-      hostelData
-    );
+    const response = await axios.post(`${BACKEND_URL}/hostel/`, hostelData);
     return response.data;
   } catch (error) {
     console.error("Error creating hostel:", error);
