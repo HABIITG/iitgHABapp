@@ -15,13 +15,10 @@ const getAllMessChangeRequestsForAllHostels = async (req, res) => {
       "name rollNumber curr_subscribed_mess hostel applied_hostel_string applied_hostel_timestamp"
     );
 
-    if (!messChangeRequests || messChangeRequests.length === 0) {
-      return res.status(404).json({ message: "No mess change requests found" });
-    }
-
+    // Return empty array instead of 404 when no requests found
     return res.status(200).json({
       message: "Mess change requests fetched successfully",
-      data: messChangeRequests,
+      data: messChangeRequests || [],
     });
   } catch (err) {
     console.error(err);

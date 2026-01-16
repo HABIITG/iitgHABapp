@@ -184,7 +184,11 @@ const webLoginHandler = async (req, res, next) => {
 
     if (loginType === "hab") {
       const HAB_EMAIL = process.env.HAB_EMAIL;
-      if (email.toLowerCase() !== HAB_EMAIL.toLowerCase())
+      const HAB_EMAIL2 = process.env.HAB_EMAIL2;
+      if (
+        email.toLowerCase() !== HAB_EMAIL.toLowerCase() &&
+        email.toLowerCase() !== HAB_EMAIL2?.toLowerCase()
+      )
         throw new AppError(403, "Unauthorized HAB login");
       token = jwt.sign({ hab: true, email }, process.env.ADMIN_JWT_SECRET, {
         expiresIn: "2h",
