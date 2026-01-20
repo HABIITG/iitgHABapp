@@ -56,6 +56,9 @@ const {
 const {
   initializeMessChangeAutoScheduler,
 } = require("./modules/mess_change/autoMessChangeScheduler.js");
+const {
+  initializeGuestCleanupScheduler,
+} = require("./modules/auth/autoGuestCleanupScheduler.js");
 const messChangeRouter = require("./modules/mess_change/messchangeRoute.js");
 require("dotenv").config();
 
@@ -146,9 +149,10 @@ mongoose
 
     sundayScheduler();
 
-    // Initialize automatic schedulers for feedback and mess change
+    // Initialize automatic schedulers for feedback, mess change, and guest cleanup
     initializeFeedbackAutoScheduler();
     initializeMessChangeAutoScheduler();
+    initializeGuestCleanupScheduler();
   })
   .catch((err) => console.log(err));
 

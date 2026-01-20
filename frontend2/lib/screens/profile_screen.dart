@@ -491,10 +491,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                           const Divider(height: 24, color: Color(0xFFE2E2E2)),
 
-                          // Outlook ID (read-only)
+                          // Email (read-only)
                           _buildField(
                             icon: Icons.email_outlined,
-                            label: "Outlook Id",
+                            label: "Email",
                             value: email.isNotEmpty ? email : 'Unknown',
                           ),
                           const SizedBox(height: 16),

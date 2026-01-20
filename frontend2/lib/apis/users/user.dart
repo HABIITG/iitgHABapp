@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:frontend2/apis/protected.dart';
 import 'package:frontend2/constants/endpoint.dart';
+import 'package:frontend2/screens/initial_setup_screen.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -22,7 +23,8 @@ Future<bool> saveUserProfileFields(
     body['roomNumber'] = roomNumber ?? '';
     body['phoneNumber'] = phoneNumber ?? '';
 
-    debugPrint('saveUserProfileFields: Sending request to ${UserEndpoints.saveUser}');
+    debugPrint(
+        'saveUserProfileFields: Sending request to ${UserEndpoints.saveUser}');
     debugPrint('saveUserProfileFields: Body: $body');
 
     final resp = await http.post(
@@ -41,7 +43,8 @@ Future<bool> saveUserProfileFields(
     if (resp.statusCode == 200) {
       return true;
     } else {
-      debugPrint('saveUserProfileFields: Failed with status ${resp.statusCode}: ${resp.body}');
+      debugPrint(
+          'saveUserProfileFields: Failed with status ${resp.statusCode}: ${resp.body}');
       return false;
     }
   } catch (e) {
@@ -79,15 +82,20 @@ Future<Map<String, String>?> fetchUserDetails() async {
       final String? mail =
           userData['email']; // Can be null for Apple-only users
       final String roll = userData['rollNumber'] ?? "Not provided";
-      final String currSubscribedMess =
-          userData['curr_subscribed_mess'] ?? "Not provided";
+      // Handle null/undefined hostel and mess - use empty string for guest users
+      final String currSubscribedMess = userData['curr_subscribed_mess'] != null
+          ? userData['curr_subscribed_mess'].toString()
+          : "";
       final String appliedMess =
           userData['applied_hostel_string'] ?? "Not provided";
-      final String hostel = userData['hostel'] ?? "Not provided";
+      final String hostel =
+          userData['hostel'] != null ? userData['hostel'].toString() : "";
       final bool gotHostel = userData['got_mess_changed'];
       final bool isSMC = userData['isSMC'] ?? false;
       final bool isSetupDone = userData['isSetupDone'] == true;
       final bool hasMicrosoftLinked = userData['hasMicrosoftLinked'] ?? false;
+      final String? guestIdentifier =
+          userData['guestIdentifier']; // Can be null for non-guest users
       final String roomNumber = (userData['roomNumber'] ?? '') as String;
       final String phoneNumber = (userData['phoneNumber'] ?? '') as String;
 
@@ -96,6 +104,25 @@ Future<Map<String, String>?> fetchUserDetails() async {
       prefs.setBool('isSMC', isSMC);
       prefs.setBool('gotMess', gotHostel);
       prefs.setBool('hasMicrosoftLinked', hasMicrosoftLinked);
+      // Store guestIdentifier if it exists (for identifying guest users)
+      if (guestIdentifier != null) {
+        prefs.setString('guestIdentifier', guestIdentifier);
+      } else {
+        prefs.remove('guestIdentifier');
+      }
+      // Check if user is a guest user (has guestIdentifier and Microsoft not linked)
+      final bool isGuest = guestIdentifier != null && !hasMicrosoftLinked;
+
+      // Guest users skip the setup screen - automatically mark setup as done
+      if (isGuest) {
+        prefs.setBool("isSetupDone", true);
+        ProfilePictureProvider.isSetupDone.value = true;
+      } else {
+        // For non-guest users, store the isSetupDone value from server
+        prefs.setBool("isSetupDone", isSetupDone);
+        ProfilePictureProvider.isSetupDone.value = isSetupDone;
+      }
+
       // Only store email if it exists (null for Apple-only users without Microsoft linked)
       if (mail != null) {
         prefs.setString('email', mail);
@@ -111,7 +138,7 @@ Future<Map<String, String>?> fetchUserDetails() async {
       prefs.setString('userId', userId);
       await prefs.setString('roomNumber', roomNumber);
       await prefs.setString('phoneNumber', phoneNumber);
-      await prefs.setBool('isSetupDone', isSetupDone);
+      // isSetupDone is already set above based on guest user check
 
       // Return the data as a map
       return {

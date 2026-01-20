@@ -20,8 +20,20 @@ class ProfilePictureProvider {
     final prefs = await SharedPreferences.getInstance();
     // Do NOT overwrite existing stored picture
     profilePictureString.value = prefs.getString("profilePicture") ?? "";
-    // Read persisted setup flag
-    isSetupDone.value = prefs.getBool("isSetupDone") ?? false;
+
+    // Check if user is a guest user (has guestIdentifier and Microsoft not linked)
+    final guestIdentifier = prefs.getString('guestIdentifier');
+    final hasMicrosoftLinked = prefs.getBool('hasMicrosoftLinked') ?? false;
+    final isGuest = guestIdentifier != null && !hasMicrosoftLinked;
+
+    // Guest users skip the setup screen - automatically mark setup as done
+    if (isGuest) {
+      isSetupDone.value = true;
+      prefs.setBool("isSetupDone", true);
+    } else {
+      // Read persisted setup flag for non-guest users
+      isSetupDone.value = prefs.getBool("isSetupDone") ?? false;
+    }
   }
 }
 
@@ -38,6 +50,7 @@ class _InitialSetupScreenState extends State<InitialSetupScreen> {
   String currMess = '';
   String hostelName = '';
   String currMessName = '';
+  bool hasMicrosoftLinked = false;
   final TextEditingController _roomController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
   bool _saving = false;
@@ -60,6 +73,7 @@ class _InitialSetupScreenState extends State<InitialSetupScreen> {
       currMess = m;
       hostelName = h.isEmpty ? '-' : calculateHostel(h);
       currMessName = m.isEmpty ? '-' : calculateHostel(m);
+      hasMicrosoftLinked = prefs.getBool('hasMicrosoftLinked') ?? false;
       _roomController.text = prefs.getString('roomNumber') ?? '';
       _phoneController.text = prefs.getString('phoneNumber') ?? '';
     });
@@ -207,7 +221,7 @@ class _InitialSetupScreenState extends State<InitialSetupScreen> {
         elevation: 0,
         backgroundColor: Colors.grey[50],
         title: const Text(
-          "Complete Profile",
+          "Additional Information",
           style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.w600,
@@ -254,8 +268,12 @@ class _InitialSetupScreenState extends State<InitialSetupScreen> {
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                 ),
                 const SizedBox(height: 12),
-                _readonlyTile(Icons.email_outlined, 'Email', email),
-                const Divider(height: 24, color: Color(0xFFE2E2E2)),
+                // Only show email field if Microsoft is linked OR if email exists (from Apple)
+                // This ensures we don't show empty email field for Apple-only users, complying with App Store Guideline 4.0
+                if (hasMicrosoftLinked || email.isNotEmpty) ...[
+                  _readonlyTile(Icons.email_outlined, 'Email', email),
+                  const Divider(height: 24, color: Color(0xFFE2E2E2)),
+                ],
                 _readonlyTile(Icons.home_outlined, 'Hostel', hostelName),
                 const Divider(height: 24, color: Color(0xFFE2E2E2)),
                 _readonlyTile(Icons.restaurant_menu_outlined, 'Current Mess',
@@ -269,7 +287,7 @@ class _InitialSetupScreenState extends State<InitialSetupScreen> {
                     SizedBox(width: 6),
                     Expanded(
                       child: Text(
-                        'Other profile details are read-only. Please contact the HAB Admin if you want to change them.',
+                        'The above details cannot be modified. Please contact the HAB Admin if you want to change them.',
                         style: TextStyle(fontSize: 12, color: Colors.black54),
                       ),
                     ),

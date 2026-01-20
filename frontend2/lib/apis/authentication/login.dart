@@ -52,17 +52,17 @@ Future<void> authenticate() async {
   }
 }
 
-/// Authenticate using guest credentials stored on the server.
-/// Sends email & password to server and expects JSON { token }
-Future<void> guestAuthenticate(String email, String password) async {
+/// Authenticate as guest user.
+/// No credentials needed - backend handles guest login automatically.
+/// Backward compatible: Old app versions may send email/password, but backend ignores them.
+Future<void> guestAuthenticate() async {
   try {
     final dio = DioClient().dio;
+    // Send empty body - backend will handle guest login automatically
+    // Old app versions may send email/password, but backend accepts and ignores them
     final resp = await dio.post(
       '$baseUrl/auth/guest',
-      data: {
-        'email': email,
-        'password': password,
-      },
+      data: {},
       options: Options(headers: {'Content-Type': 'application/json'}),
     );
 

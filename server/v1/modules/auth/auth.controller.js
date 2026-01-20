@@ -2,12 +2,14 @@
 const axios = require("axios");
 const qs = require("querystring");
 const jwt = require("jsonwebtoken");
+const crypto = require("crypto");
 const AppError = require("../../utils/appError.js");
 const {
   getUserFromToken,
   User,
   findUserWithEmail,
   findUserWithAppleIdentifier,
+  findUserWithGuestIdentifier,
 } = require("../user/userModel.js");
 const UserAllocHostel = require("../hostel/hostelAllocModel.js");
 const {
@@ -283,22 +285,33 @@ const appleLoginHandler = async (req, res, next) => {
     let existingUser = await findUserWithAppleIdentifier(userIdentifier);
 
     if (!existingUser) {
-      // Create new user without roll number and without email
-      // NOTE: Do NOT store Apple email in the email field - email field is only for Microsoft/Outlook emails
-      // Apple emails (like @icloud.com, @me.com) are NOT Microsoft emails
-      const user = new User({
+      // Create new user with Apple name and email
+      // Store Apple email - it will be replaced with Microsoft email when account is linked
+      const userData = {
         name: name || "User",
-        email: null, // Email field is ONLY for Microsoft/Outlook emails - set when Microsoft is linked
+        email: email || null, // Store Apple email if provided (will be replaced by Microsoft email when linked)
         appleUserIdentifier: userIdentifier,
-        rollNumber: null, // Will be set when Microsoft is linked
+        // Don't set rollNumber - leave it undefined to avoid MongoDB unique index issues with null
         authProvider: "apple",
         hasMicrosoftLinked: false,
-      });
+      };
+      const user = new User(userData);
       existingUser = await user.save();
     } else {
-      // If user exists, update name if provided
-      if (name && name !== existingUser.name) {
-        existingUser.name = name;
+      // If user exists, update name and email if provided and not already linked to Microsoft
+      // Once Microsoft is linked, don't overwrite with Apple data
+      if (!existingUser.hasMicrosoftLinked) {
+        if (name && name.trim() !== '') {
+          existingUser.name = name;
+        }
+        if (email && email.trim() !== '') {
+          existingUser.email = email;
+        }
+      } else {
+        // If Microsoft is already linked, only update name if it's not already set from Microsoft
+        if (name && name.trim() !== '' && !existingUser.name) {
+          existingUser.name = name;
+        }
       }
       await existingUser.save();
     }
@@ -371,11 +384,12 @@ const linkMicrosoftAccount = async (req, res, next) => {
       existingUserWithEmail &&
       existingUserWithEmail._id.toString() !== userId.toString()
     ) {
-      // The Microsoft account already exists - merge Apple account into Microsoft account
-      // Preserve shared fields (profile picture, phone number, room number) from Apple account
+      // The Microsoft account already exists - merge Apple/Guest account into Microsoft account
+      // Preserve shared fields (profile picture, phone number, room number) from Apple/Guest account
       const appleUserIdentifier = currentUser.appleUserIdentifier;
+      const guestIdentifier = currentUser.guestIdentifier;
 
-      // Preserve profile picture from Apple account if Microsoft account doesn't have one
+      // Preserve profile picture from Apple/Guest account if Microsoft account doesn't have one
       if (
         currentUser.profilePictureUrl &&
         !existingUserWithEmail.profilePictureUrl
@@ -390,28 +404,31 @@ const linkMicrosoftAccount = async (req, res, next) => {
           currentUser.profilePictureItemId;
       }
 
-      // Preserve phone number from Apple account if Microsoft account doesn't have one
+      // Preserve phone number from Apple/Guest account if Microsoft account doesn't have one
       if (currentUser.phoneNumber && !existingUserWithEmail.phoneNumber) {
         existingUserWithEmail.phoneNumber = currentUser.phoneNumber;
       }
 
-      // Preserve room number from Apple account if Microsoft account doesn't have one
+      // Preserve room number from Apple/Guest account if Microsoft account doesn't have one
       if (currentUser.roomNumber && !existingUserWithEmail.roomNumber) {
         existingUserWithEmail.roomNumber = currentUser.roomNumber;
       }
 
-      // Preserve setup status (if Apple user completed setup but Microsoft didn't)
-      if (currentUser.isSetupDone && !existingUserWithEmail.isSetupDone) {
-        existingUserWithEmail.isSetupDone = currentUser.isSetupDone;
-      }
-
-      // Delete the duplicate Apple-only user to free up the appleUserIdentifier
+      // Don't overwrite isSetupDone - persist Microsoft account's state
+      // Microsoft account's isSetupDone is already set correctly, don't change it
+      
+      // Delete the duplicate Apple/Guest-only user
       await User.findByIdAndDelete(userId);
 
-      // Then update the existing Microsoft user to include Apple identifier
-      existingUserWithEmail.appleUserIdentifier = appleUserIdentifier;
-      existingUserWithEmail.authProvider = "both";
-      // Keep Microsoft account's data (email, rollNumber, hostel, etc.)
+      // Then update the existing Microsoft user to include Apple identifier (if it was Apple)
+      if (appleUserIdentifier) {
+        existingUserWithEmail.appleUserIdentifier = appleUserIdentifier;
+        existingUserWithEmail.authProvider = "both";
+      } else {
+        // If it was a guest account, just keep Microsoft account as is
+        // guestIdentifier is not preserved (guest accounts are temporary)
+      }
+      // Keep Microsoft account's data (email, rollNumber, hostel, isSetupDone, etc.)
       await existingUserWithEmail.save();
 
       // Return token for the merged account
@@ -458,8 +475,19 @@ const linkMicrosoftAccount = async (req, res, next) => {
       ? currentSubscribedMess._id
       : allocatedHostel._id;
     currentUser.hasMicrosoftLinked = true; // Microsoft account = student account (surname exists)
-    currentUser.authProvider =
-      currentUser.authProvider === "apple" ? "both" : "microsoft";
+    
+    // Update authProvider based on current provider
+    if (currentUser.authProvider === "apple") {
+      currentUser.authProvider = "both";
+    } else if (currentUser.authProvider === "guest") {
+      // Guest account converted to Microsoft account
+      // Keep guestIdentifier for history, but mark as Microsoft account
+      currentUser.authProvider = "microsoft";
+      // Set isSetupDone to false when guest links Microsoft account (fresh start with student account)
+      currentUser.isSetupDone = false;
+    } else {
+      currentUser.authProvider = "microsoft";
+    }
 
     await currentUser.save();
 
@@ -474,36 +502,42 @@ const linkMicrosoftAccount = async (req, res, next) => {
 };
 
 // Guest login
+// Backward compatible: Accepts email/password from old app versions but ignores them
+// New app versions can send empty body and still login as guest
+// Each guest login creates a unique guest account identified by guestIdentifier (UUID)
 const guestLoginHandler = async (req, res, next) => {
   try {
     const { email, password } = req.body || {};
-    if (!email || !password)
-      return res.status(400).json({ message: "Email and password required" });
+    
+    // Backward compatibility: Old app versions send email/password, but we ignore them
+    // New app versions send nothing, which is also fine
+    
+    // Generate unique guest identifier (UUID) for this guest session
+    const guestIdentifier = crypto.randomUUID();
 
-    if (
-      email.toLowerCase() !== process.env.GUEST_EMAIL.toLowerCase() ||
-      password !== process.env.GUEST_EMAIL_PASSWORD
-    ) {
-      return res.status(401).json({ message: "Invalid credentials" });
-    }
-
-    let existingUser = await findUserWithEmail(email);
-    if (!existingUser) {
-      const GUEST_ROLL = process.env.GUEST_ROLL;
-      const allocatedHostel = await getHostelAlloc(GUEST_ROLL);
-
-      const user = new User({
-        name: "Guest User",
-        degree: "BTech",
-        rollNumber: GUEST_ROLL,
-        email,
-        hostel: allocatedHostel?._id,
-      });
-      existingUser = await user.save();
-    }
+    // Create new guest user for each login (don't reuse accounts)
+    // Similar to Apple Sign-In: each guest gets unique account identified by guestIdentifier
+    // Give guest users a unique rollNumber to avoid MongoDB sparse unique index conflicts with null
+    // Format: "GUEST-{UUID}" - this ensures uniqueness and identifies guest users
+    const userData = {
+      name: "Guest User",
+      guestIdentifier: guestIdentifier,
+      rollNumber: `GUEST-${guestIdentifier}`, // Unique rollNumber for guest users to avoid index conflicts
+      // Don't set email - leave it undefined (similar to Apple Sign-In when email not provided)
+      // Don't set hostel or curr_subscribed_mess
+      // This ensures guest users cannot access features requiring these fields
+      authProvider: "guest",
+      hasMicrosoftLinked: false,
+    };
+    
+    // Create user using Mongoose (normal approach - rollNumber is explicitly set so no conflicts)
+    const existingUser = await User.create(userData);
 
     const token = existingUser.generateJWT();
-    return res.status(200).json({ token });
+    return res.status(200).json({ 
+      token,
+      hasMicrosoftLinked: false,
+    });
   } catch (err) {
     console.error("Error in guestLoginHandler:", err);
     next(new AppError(500, "Guest login failed"));

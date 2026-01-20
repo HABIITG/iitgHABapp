@@ -131,6 +131,12 @@ const userSchema = new mongoose.Schema({
     unique: true,
     sparse: true, // Allow multiple null values
   },
+  guestIdentifier: {
+    type: String,
+    required: false,
+    unique: true,
+    sparse: true, // Allow multiple null values
+  },
   year: {
     type: Number,
   },
@@ -208,7 +214,7 @@ const userSchema = new mongoose.Schema({
   },
   authProvider: {
     type: String,
-    enum: ["apple", "microsoft", "both"],
+    enum: ["apple", "microsoft", "both", "guest"],
     default: "microsoft", // Default for backward compatibility
   },
 });
@@ -270,9 +276,16 @@ const findUserWithAppleIdentifier = async function (appleUserIdentifier) {
   return user;
 };
 
+const findUserWithGuestIdentifier = async function (guestIdentifier) {
+  const user = await User.findOne({ guestIdentifier: guestIdentifier });
+  if (!user) return false;
+  return user;
+};
+
 module.exports = {
   getUserFromToken,
   User,
   findUserWithEmail,
   findUserWithAppleIdentifier,
+  findUserWithGuestIdentifier,
 };

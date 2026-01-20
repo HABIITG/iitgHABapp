@@ -44,6 +44,35 @@ class _MessChangePreferenceScreenState
   Future<void> _checkMicrosoftLink() async {
     final prefs = await SharedPreferences.getInstance();
     final hasMicrosoftLinked = prefs.getBool('hasMicrosoftLinked') ?? false;
+    final guestIdentifier = prefs.getString('guestIdentifier');
+
+    // Don't show link account dialog for guest users - show message instead
+    // Check: guestIdentifier exists AND Microsoft not linked = active guest user
+    if (guestIdentifier != null && !hasMicrosoftLinked) {
+      if (mounted) {
+        Navigator.pop(context);
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Center(
+                  child: Text(
+                    'Mess Change is not available for guest users. Please sign in with a student account to access this feature.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+                backgroundColor: Colors.black,
+                behavior: SnackBarBehavior.floating,
+                margin: EdgeInsets.all(50),
+                duration: Duration(seconds: 4),
+              ),
+            );
+          }
+        });
+      }
+      return;
+    }
 
     if (!hasMicrosoftLinked && mounted) {
       // Show dialog to link Microsoft account

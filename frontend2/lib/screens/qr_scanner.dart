@@ -32,23 +32,31 @@ class _QrScanState extends State<QrScan> {
   @override
   void initState() {
     super.initState();
-    _checkMicrosoftLink();
+    _checkMicrosoftLink().then((_) {
+      // Only check profile pic if user is not a guest (widget still mounted)
+      if (mounted) {
+        _checkProfilePic();
+        _initializeCameraPermission();
+      }
+    });
     controller = MobileScannerController(
       detectionSpeed: DetectionSpeed.noDuplicates,
       facing: CameraFacing.back,
       torchEnabled: false,
-      autoStart: false, // Disable autoStart to manually control when camera starts
+      autoStart:
+          false, // Disable autoStart to manually control when camera starts
     );
-    _checkProfilePic();
-    _initializeCameraPermission();
   }
 
   Future<void> _checkMicrosoftLink() async {
     final prefs = await SharedPreferences.getInstance();
     final hasMicrosoftLinked = prefs.getBool('hasMicrosoftLinked') ?? false;
 
+    // Allow guest and Apple users to access the QR scanner screen
+    // They will be prompted to link Microsoft account when they actually try to scan
+    // This matches the flow for Apple users
     if (!hasMicrosoftLinked && mounted) {
-      // Show dialog to link Microsoft account
+      // Show dialog to link Microsoft account, then navigate back
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) {
           showDialog(
@@ -65,7 +73,18 @@ class _QrScanState extends State<QrScan> {
     }
   }
 
-  void _checkProfilePic() {
+  void _checkProfilePic() async {
+    // Don't show profile pic dialog for guest or Apple users (Microsoft not linked)
+    // They should link their account first
+    final prefs = await SharedPreferences.getInstance();
+    final hasMicrosoftLinked = prefs.getBool('hasMicrosoftLinked') ?? false;
+
+    // Skip profile pic check for guest and Apple users
+    if (!hasMicrosoftLinked) {
+      return;
+    }
+
+    // Only check profile pic for Microsoft-linked users
     if (ProfilePictureProvider.profilePictureString.value.isEmpty) {
       setState(() {
         _profilePicMissing = true;
@@ -77,6 +96,9 @@ class _QrScanState extends State<QrScan> {
   }
 
   void _showProfilePicDialog() {
+    // Don't show dialog if widget is disposed
+    if (!mounted) return;
+
     final navigator = Navigator.of(context);
     showDialog(
       context: context,
@@ -107,9 +129,11 @@ class _QrScanState extends State<QrScan> {
             actions: [
               ElevatedButton(
                 onPressed: () {
-                  setState(() {
-                    _profilePicMissing = false; // Allow pop temporarily
-                  });
+                  if (mounted) {
+                    setState(() {
+                      _profilePicMissing = false; // Allow pop temporarily
+                    });
+                  }
                   Navigator.of(dialogContext).pop(); // Close dialog
                   navigator.pop(); // Go back to previous screen
                 },
@@ -399,8 +423,26 @@ class _QrScanState extends State<QrScan> {
     }
   }
 
-  void onBarcodeDetected(BarcodeCapture capture) {
+  void onBarcodeDetected(BarcodeCapture capture) async {
     if (_hasScanned || _isProcessing) return;
+
+    // Check if Microsoft is linked before allowing scan (for guest and Apple users)
+    final prefs = await SharedPreferences.getInstance();
+    final hasMicrosoftLinked = prefs.getBool('hasMicrosoftLinked') ?? false;
+
+    if (!hasMicrosoftLinked) {
+      // Show dialog to link Microsoft account
+      if (mounted) {
+        controller.stop();
+        showDialog(
+          context: context,
+          builder: (context) => const MicrosoftRequiredDialog(
+            featureName: 'QR Code Scanning',
+          ),
+        );
+      }
+      return;
+    }
 
     setState(() {
       _hasScanned = true;
