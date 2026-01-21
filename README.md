@@ -105,6 +105,20 @@ This app helps students to put a complaint about issues faced in hostel. It also
    npm run start
    ```
 
+---
+
+## 🤝 Workflow & Deployment
+
+We follow a specific branching strategy to ensure stability:
+
+- **`dev` Branch**: This is the active development branch. **All code changes, features, and fixes must be committed here.** Please create Pull Requests (PRs) against the `dev` branch.
+- **`prod` Branch**: This branch is strictly for **production server deployment**. It reflects the live state of the application.
+
+> [!NOTE]
+> Do not commit directly to `prod`. Changes are merged from `dev` to `prod` only when ready for release.
+
+---
+
 ## 📜 License
 
 IIT Guwahati © 2024 Hostel Affairs Board
