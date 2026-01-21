@@ -507,16 +507,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                 ),
                               ),
                               Positioned(
-                                right: 50 * scaleFactor,
-                                top: 100 * scaleFactor,
-                                child: const FeatureButton(
-                                  text: 'Complaints',
-                                  color: Color(0xFFD14B65),
-                                  imagePath:
-                                      'assets/images/features/complaints.png',
-                                ),
-                              ),
-                              Positioned(
                                 left: 40 * scaleFactor,
                                 top: 160 * scaleFactor,
                                 child: const FeatureButton(
@@ -556,7 +546,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                             ),
                             SizedBox(height: 8),
                             Text(
-                              'From mess feedback to shared complaints, from schedules to updates, everything you need is now just a tap away.',
+                              'From mess feedback to schedules and updates, everything you need is now just a tap away.',
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 color: Colors.white70,

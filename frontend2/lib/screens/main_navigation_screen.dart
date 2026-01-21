@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:frontend2/screens/initial_setup_screen.dart';
 import 'package:frontend2/screens/mess_preference.dart';
 import 'package:frontend2/screens/profile_screen.dart';
-import 'package:frontend2/utilities/coming_soon.dart';
 import 'home_screen.dart';
 import 'mess_screen.dart';
 import '../utilities/notifications.dart';
@@ -88,7 +87,6 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     final screens = [
       HomeScreen(onNavigateToTab: _handleNavTap),
       const MessScreen(),
-      const ComingSoonScreen(),
     ];
     return ValueListenableBuilder(
       valueListenable: ProfilePictureProvider.isSetupDone,

@@ -43,12 +43,6 @@ class VersionChecker {
     _appVersion = packageInfo.version;
     _buildNumber = packageInfo.buildNumber;
 
-    debugPrint('======================================');
-    debugPrint('Device Type: $_deviceType');
-    debugPrint('App Version: $_appVersion');
-    debugPrint('Build Number: $_buildNumber');
-    debugPrint('Initial API Version: $_apiVersion');
-    debugPrint('======================================');
   }
 
   /// Returns the headers to be injected into Dio requests
@@ -65,7 +59,6 @@ class VersionChecker {
   static Future<bool> checkForUpdate() async {
     try {
       if (_deviceType != 'Android' && _deviceType != 'iOS') {
-        debugPrint('Version check skipped: Not a mobile platform');
         return false;
       }
 
@@ -77,8 +70,6 @@ class VersionChecker {
       final endpoint = _deviceType == 'Android'
           ? AppVersionEndpoints.getAndroidVersion
           : AppVersionEndpoints.getIosVersion;
-
-      debugPrint('Checking version at: $endpoint');
 
       final response = await dio.get(endpoint);
 
@@ -93,32 +84,24 @@ class VersionChecker {
         _storeUrl = data['storeUrl'] as String?;
         _updateMessage = data['updateMessage'] as String?;
 
-        debugPrint('Server Latest Version: $serverVersion');
-        debugPrint('Local App Version: $_appVersion');
-
         // --- CORE LOGIC START ---
         int localMajor = _getMajorVersion(_appVersion!);
         int serverMajor = _getMajorVersion(serverVersion);
         int diff = serverMajor - localMajor;
 
-        debugPrint('Major Version Diff: $diff');
-
         if (diff <= 0) {
           // Case: App is equal to (or newer than) Server
           _apiVersion = 'v1';
           _updateRequired = false;
-          debugPrint('Status: Up to date. Using API V1.');
         } else if (diff == 1) {
           // Case: App is 1 version behind (13 vs 14)
           // Use Legacy API
           _apiVersion = 'v2';
           _updateRequired = false;
-          debugPrint('Status: Slightly old. Switching to Legacy API V2.');
         } else {
           // Case: App is 2+ versions behind (13 vs 15)
           // Force Update
           _updateRequired = true;
-          debugPrint('Status: Too old. Force Update Required.');
           return true;
         }
         // --- CORE LOGIC END ---
@@ -126,7 +109,6 @@ class VersionChecker {
 
       return false;
     } catch (e) {
-      debugPrint('Version check failed: $e');
       // If check fails, default to V1 and allow app usage
       _apiVersion = 'v1';
       return false;
@@ -138,7 +120,7 @@ class VersionChecker {
     try {
       return int.parse(version.split('.')[0]);
     } catch (e) {
-      debugPrint('Error parsing major version from $version: $e');
+      if (kDebugMode) debugPrint('Error parsing major version from $version: $e');
       return 0;
     }
   }

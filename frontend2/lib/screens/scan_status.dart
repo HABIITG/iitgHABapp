@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:frontend2/screens/main_navigation_screen.dart';
@@ -44,8 +45,8 @@ class _ScanStatusPageState extends State<ScanStatusPage> {
   Widget _buildStatusContent(BuildContext context) {
     final statusCode = widget.response.statusCode ?? 500;
     final data = widget.response.data as Map<String, dynamic>? ?? {};
-    debugPrint(data['message']?.toString());
-    debugPrint(statusCode.toString());
+    if (kDebugMode) debugPrint(data['message']?.toString());
+    if (kDebugMode) debugPrint(statusCode.toString());
     if (statusCode == 200 &&
         data['message']?.toString().contains('Already') != true) {
       return _buildSuccessScreen(context, data);

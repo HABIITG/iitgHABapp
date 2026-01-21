@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:frontend2/utilities/notifications.dart';
 
@@ -10,6 +9,6 @@ class NotificationProvider {
   static void init() {
     // The notifications.dart file handles all initialization
     // This is just a compatibility wrapper
-    debugPrint('✅ NotificationProvider initialized (using global notifier)');
+    if (kDebugMode) debugPrint('✅ NotificationProvider initialized (using global notifier)');
   }
 }

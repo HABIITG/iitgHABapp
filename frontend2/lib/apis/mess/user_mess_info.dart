@@ -7,7 +7,7 @@ import 'package:dio/dio.dart';
 
 Future<void> getUserMessInfo() async {
   try {
-    debugPrint('API calling getusermessinfo');
+    if (kDebugMode) debugPrint('API calling getusermessinfo');
     final dio = DioClient().dio;
     final token = await getAccessToken();
 
@@ -20,18 +20,19 @@ Future<void> getUserMessInfo() async {
         },
       ),
     );
-    debugPrint("response");
-    debugPrint(response.toString());
+    if (kDebugMode) {
+      debugPrint("response");
+      debugPrint(response.toString());
+    }
     if (response.statusCode == 200) {
       final prefs = await SharedPreferences.getInstance();
 
       final Map<String, dynamic> userData =
           response.data as Map<String, dynamic>;
-      debugPrint('user mess info is $userData');
+      if (kDebugMode) debugPrint('user mess info is $userData');
       final String messID = userData['_id'] ?? "Not found";
       final String messName = userData['name'] ?? "Not found";
       final String hostelID = userData['hostelId'] ?? "Not found";
-      //Leaving complaints for now,
       final int rating = userData['rating'] ?? "Not found";
       final int ranking = userData['ranking'] ?? "Not found";
 
@@ -42,6 +43,6 @@ Future<void> getUserMessInfo() async {
       prefs.setInt('ranking', ranking);
     }
   } catch (e) {
-    debugPrint('API Error in userMessInfo: $e');
+    if (kDebugMode) debugPrint('API Error in userMessInfo: $e');
   }
 }

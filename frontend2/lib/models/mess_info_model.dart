@@ -2,7 +2,6 @@ class MessInfoModel {
   final String id;
   final String name;
   final String hostelId;
-  final List<dynamic> complaints;
   final int rating;
   final int ranking;
   final String hostelName;
@@ -11,7 +10,6 @@ class MessInfoModel {
     required this.id,
     required this.name,
     required this.hostelId,
-    required this.complaints,
     required this.rating,
     required this.ranking,
     required this.hostelName,
@@ -22,7 +20,6 @@ class MessInfoModel {
       id: json['_id'],
       name: json['name'],
       hostelId: json['hostelId'],
-      complaints: json['complaints'] ?? [],
       rating: json['rating'] ?? 0,
       ranking: json['ranking'] ?? 0,
       hostelName: json['hostelName'],

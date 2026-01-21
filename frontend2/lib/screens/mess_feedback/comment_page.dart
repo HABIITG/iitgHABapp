@@ -25,8 +25,6 @@ class _CommentPageState extends State<CommentPage> {
     final provider = Provider.of<FeedbackProvider>(context, listen: false);
 
     try {
-      debugPrint('submitFeedback triggered');
-
       // Gather async data first so we don't use BuildContext across async gaps.
       final prefs = await SharedPreferences.getInstance();
       final isSMC = prefs.getBool('isSMC') ?? false;
@@ -50,8 +48,6 @@ class _CommentPageState extends State<CommentPage> {
         return;
       }
 
-      debugPrint("starting feedback request");
-
       // Prepare payload
       final Map<String, dynamic> payload = {
         'name': name,
@@ -71,8 +67,6 @@ class _CommentPageState extends State<CommentPage> {
           'uniformAndPunctuality': provider.uniformAndPunctuality,
         };
       }
-
-      debugPrint("Payload: : : ${jsonEncode(payload)}");
 
       final url = Uri.parse(MessFeedback.feedbackSubmit);
 
@@ -99,9 +93,7 @@ class _CommentPageState extends State<CommentPage> {
           SnackBar(content: Text('Error: ${response.body}')),
         );
       }
-    } catch (e, stack) {
-      debugPrint("Error in submitFeedback: $e");
-      debugPrint(stack.toString());
+    } catch (e) {
       if (mounted) {
         messenger.showSnackBar(
           SnackBar(content: Text('Unexpected error: $e')),
@@ -112,7 +104,6 @@ class _CommentPageState extends State<CommentPage> {
 
   @override
   Widget build(BuildContext context) {
-    debugPrint("Building CommentPage");
 
     return Scaffold(
       appBar: AppBar(

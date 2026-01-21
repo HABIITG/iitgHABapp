@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend2/apis/dio_client.dart';
 import 'package:frontend2/apis/protected.dart';
@@ -99,7 +100,7 @@ class _MessChangePreferenceScreenState
         isSMC = prefs.getBool('isSMC') ?? false;
       });
     } catch (e) {
-      debugPrint('Error checking SMC status: $e');
+      if (kDebugMode) debugPrint('Error checking SMC status: $e');
     }
   }
 
@@ -165,7 +166,7 @@ class _MessChangePreferenceScreenState
         });
       }
     } catch (e) {
-      debugPrint('Error fetching mess change status: $e');
+      if (kDebugMode) debugPrint('Error fetching mess change status: $e');
       _showMessage("Error", "Unable to fetch mess change status.");
     } finally {
       if (mounted) setState(() => loadingStatus = false);
@@ -242,14 +243,14 @@ class _MessChangePreferenceScreenState
       }
     } catch (e) {
       if (e is DioException) {
-        debugPrint('Error submitting mess change: $e');
+        if (kDebugMode) debugPrint('Error submitting mess change: $e');
         _showMessage(
           "Error",
           "${e.response?.data['message'] ?? "We couldn't process your request!"}",
           refreshAfter: true,
         );
       } else {
-        debugPrint('Error submitting mess change: $e');
+        if (kDebugMode) debugPrint('Error submitting mess change: $e');
         _showMessage(
           "Error",
           "We couldn't process your request!",

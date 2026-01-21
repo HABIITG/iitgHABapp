@@ -5,3 +5,7 @@ hab-frontend/.env
 hostel-frontend/.env
 smc-frontend/.env
 login-frontend/.env
+
+# macOS system files
+.DS_Store
+**/.DS_Store

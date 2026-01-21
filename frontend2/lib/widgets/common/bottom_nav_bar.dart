@@ -98,34 +98,6 @@ class BottomNavBar extends StatelessWidget {
                   ),
                 ),
               ),
-              Expanded(
-                child: InkWell(
-                  onTap: () {
-                    onTap(2);
-                  },
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.feedback_outlined,
-                        size: 22,
-                        color: currentIndex == 2
-                            ? const Color(0xFF4C4EDB)
-                            : const Color(0xFF676767),
-                      ),
-                      const SizedBox(height: 3),
-                      Text(
-                        "Complaints",
-                        style: TextStyle(
-                            fontSize: 12,
-                            color: currentIndex == 2
-                                ? const Color(0xFF4C4EDB)
-                                : const Color(0xFF676767)),
-                      )
-                    ],
-                  ),
-                ),
-              )
             ],
           ),
         ),

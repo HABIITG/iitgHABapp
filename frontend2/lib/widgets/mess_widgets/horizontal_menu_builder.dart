@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend2/apis/mess/menu_like.dart';
 import '../../apis/mess/mess_menu.dart';
@@ -155,7 +156,7 @@ class _IndividualMealCardState extends State<IndividualMealCard>
   void initState() {
     super.initState();
     _menu = widget.menu;
-    debugPrint("🥳🥳 is mess subscribes??: ${widget.isSubscribed}");
+    if (kDebugMode) debugPrint("🥳🥳 is mess subscribes??: ${widget.isSubscribed}");
     _expanded = _statusText().startsWith("Ongoing");
   }
 
@@ -207,7 +208,7 @@ class _IndividualMealCardState extends State<IndividualMealCard>
         });
       }
     } catch (error) {
-      debugPrint(error.toString());
+      if (kDebugMode) debugPrint(error.toString());
       setState(() {
         _menu.items[index].isLiked = !_menu.items[index].isLiked;
       });

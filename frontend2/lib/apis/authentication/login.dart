@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_web_auth_2/flutter_web_auth_2.dart';
@@ -22,11 +23,7 @@ Future<void> authenticate() async {
     final result = await FlutterWebAuth2.authenticate(
         url: AuthEndpoints.getAccess, callbackUrlScheme: "iitghab");
 
-    debugPrint("result: $result");
-
     final accessToken = Uri.parse(result).queryParameters['token'];
-    debugPrint("access token is");
-    debugPrint(accessToken);
 
     final prefs = await SharedPreferences.getInstance();
 
@@ -43,11 +40,7 @@ Future<void> authenticate() async {
     ProfilePictureProvider.init();
   } on PlatformException catch (_) {
     rethrow;
-  } catch (e, st) {
-    // Better debugging output: print the error and stacktrace so we can see why
-    // FlutterWebAuth2 failed to return the expected redirect URL (or token).
-    debugPrint('Error in getting code: $e');
-    debugPrint(st.toString());
+  } catch (e) {
     rethrow;
   }
 }
@@ -82,9 +75,7 @@ Future<void> guestAuthenticate() async {
     await registerFcmToken();
     await HostelsNotifier.init();
     ProfilePictureProvider.init();
-  } catch (e, st) {
-    debugPrint('Error in guestAuthenticate: $e');
-    debugPrint(st.toString());
+  } catch (e) {
     rethrow;
   }
 }
@@ -96,7 +87,7 @@ Future<void> logoutHandler(context) async {
     await dio.get('$baseUrl/auth/logout',
         options: Options(validateStatus: (status) => true));
   } catch (e) {
-    debugPrint('Warning: server logout failed: $e');
+    // Server logout failed, continue with local logout
   }
 
   final prefs = await SharedPreferences.getInstance();
@@ -123,7 +114,7 @@ Future<void> logoutHandler(context) async {
         (route) => false,
       );
     } catch (e) {
-      debugPrint('Navigation to login failed: $e');
+      if (kDebugMode) debugPrint('Navigation to login failed: $e');
     }
   }
 }
@@ -175,14 +166,12 @@ Future<void> signInWithApple() async {
     await HostelsNotifier.init();
     ProfilePictureProvider.init();
   } on SignInWithAppleAuthorizationException catch (e) {
-    debugPrint('Apple Sign-In Authorization Error: ${e.code}');
     // Error code 1000 often means simulator limitation or missing configuration
     if (e.code == AuthorizationErrorCode.unknown) {
       throw ('Sign in with Apple is not available. This may be due to simulator limitations. Please test on a real device or check your Apple Developer account configuration.');
     }
     rethrow;
   } catch (e) {
-    debugPrint('Error during Apple Sign-In: $e');
     rethrow;
   }
 }
@@ -196,8 +185,6 @@ Future<void> linkMicrosoftAccount() async {
       callbackUrlScheme: "iitghab",
     );
 
-    debugPrint("Link Microsoft redirect result: $result");
-
     // Parse the redirect URL - backend redirects to iitghab://link?code=...
     final uri = Uri.parse(result);
     final code = uri.queryParameters['code'];
@@ -208,8 +195,6 @@ Future<void> linkMicrosoftAccount() async {
     }
 
     if (code == null) {
-      debugPrint(
-          "No code found in redirect. Full URL: $result, Query parameters: ${uri.queryParameters}");
       throw ('Authorization code not found in redirect URL');
     }
 
@@ -248,7 +233,6 @@ Future<void> linkMicrosoftAccount() async {
     // Trigger home screen refresh to update displayed name
     homeScreenRefreshNotifier.value = true;
   } catch (e) {
-    debugPrint('Error linking Microsoft account: $e');
     rethrow;
   }
 }

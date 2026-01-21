@@ -1,4 +1,5 @@
 import 'package:dropdown_button2/dropdown_button2.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend2/providers/hostels.dart';
 // shared_preferences not used here; removed to avoid unused import
@@ -30,7 +31,7 @@ class _HostelDropState extends State<HostelDrop> {
       setState(() {
         hostels = HostelsNotifier.hostels;
       });
-      debugPrint("hostels: $hostels\nselected hostel: $selectedHostel");
+      if (kDebugMode) debugPrint("hostels: $hostels\nselected hostel: $selectedHostel");
     });
   }
 

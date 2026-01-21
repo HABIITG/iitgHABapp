@@ -5,7 +5,6 @@ import 'package:frontend2/screens/login_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:flutter/services.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -16,7 +15,6 @@ class SettingsScreen extends StatefulWidget {
 
 class _SettingsScreenState extends State<SettingsScreen> {
   String _appVersion = 'Loading...';
-  bool _isDeleting = false;
 
   @override
   void initState() {
@@ -202,37 +200,37 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
                           try {
                             await deleteUserAccount();
-                            if (context.mounted) {
-                              Navigator.of(dialogContext).pop();
-                              // Clear local data and logout
-                              final prefs =
-                                  await SharedPreferences.getInstance();
-                              await prefs.clear();
-                              Navigator.of(context).pushAndRemoveUntil(
-                                MaterialPageRoute(
-                                  builder: (context) => const LoginScreen(),
-                                ),
-                                (route) => false,
-                              );
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Account deleted successfully'),
-                                  backgroundColor: Colors.green,
-                                ),
-                              );
-                            }
+                            if (!dialogContext.mounted) return;
+                            Navigator.of(dialogContext).pop();
+                            // Clear local data and logout
+                            final prefs =
+                                await SharedPreferences.getInstance();
+                            await prefs.clear();
+                            if (!context.mounted) return;
+                            Navigator.of(context).pushAndRemoveUntil(
+                              MaterialPageRoute(
+                                builder: (context) => const LoginScreen(),
+                              ),
+                              (route) => false,
+                            );
+                            if (!context.mounted) return;
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Account deleted successfully'),
+                                backgroundColor: Colors.green,
+                              ),
+                            );
                           } catch (e) {
                             setState(() {
                               isDeleting = false;
                             });
-                            if (context.mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text('Error: ${e.toString()}'),
-                                  backgroundColor: Colors.red,
-                                ),
-                              );
-                            }
+                            if (!dialogContext.mounted) return;
+                            ScaffoldMessenger.of(dialogContext).showSnackBar(
+                              SnackBar(
+                                content: Text('Error: ${e.toString()}'),
+                                backgroundColor: Colors.red,
+                              ),
+                            );
                           }
                         },
                   style: ButtonStyle(
@@ -517,9 +515,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                     trailing: Icon(Icons.chevron_right,
                         color: Colors.grey[400], size: 20),
-                    onTap: _isDeleting
-                        ? null
-                        : () => _showDeleteAccountDialog(context),
+                    onTap: () => _showDeleteAccountDialog(context),
                   ),
                 ),
               ],

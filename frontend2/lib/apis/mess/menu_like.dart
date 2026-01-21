@@ -24,7 +24,7 @@ class MenuLikeAPI {
 
       return response.statusCode == 200;
     } catch (e) {
-      debugPrint('Error toggling like: $e');
+      if (kDebugMode) debugPrint('Error toggling like: $e');
       return false;
     }
   }

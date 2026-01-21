@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
 import 'package:frontend2/apis/protected.dart';
 import 'package:frontend2/constants/endpoint.dart';
 import 'package:frontend2/screens/initial_setup_screen.dart';
@@ -15,7 +14,6 @@ Future<bool> saveUserProfileFields(
     {String? roomNumber, String? phoneNumber}) async {
   final header = await getAccessToken();
   if (header == 'error') {
-    debugPrint('saveUserProfileFields: No access token available');
     return false;
   }
 
@@ -24,10 +22,6 @@ Future<bool> saveUserProfileFields(
     // Always include fields, even if null/empty, so server can clear them
     body['roomNumber'] = roomNumber ?? '';
     body['phoneNumber'] = phoneNumber ?? '';
-
-    debugPrint(
-        'saveUserProfileFields: Sending request to ${UserEndpoints.saveUser}');
-    debugPrint('saveUserProfileFields: Body: $body');
 
     final resp = await http.post(
       Uri.parse(UserEndpoints.saveUser),
@@ -39,18 +33,12 @@ Future<bool> saveUserProfileFields(
       body: json.encode(body),
     );
 
-    debugPrint('saveUserProfileFields: Response status: ${resp.statusCode}');
-    debugPrint('saveUserProfileFields: Response body: ${resp.body}');
-
     if (resp.statusCode == 200) {
       return true;
     } else {
-      debugPrint(
-          'saveUserProfileFields: Failed with status ${resp.statusCode}: ${resp.body}');
       return false;
     }
   } catch (e) {
-    debugPrint('saveUserProfileFields error: $e');
     return false;
   }
 }
@@ -58,7 +46,6 @@ Future<bool> saveUserProfileFields(
 Future<Map<String, String>?> fetchUserDetails() async {
   final header = await getAccessToken();
 
-  debugPrint("token is $header");
   if (header == 'error') {
     throw ('token not found');
   }
@@ -70,13 +57,10 @@ Future<Map<String, String>?> fetchUserDetails() async {
         "Content-Type": "application/json",
       },
     );
-    debugPrint('Response headers: ${resp.headers}');
 
     if (resp.statusCode == 200) {
       final prefs = await SharedPreferences.getInstance();
       final Map<String, dynamic> userData = json.decode(resp.body);
-
-      debugPrint("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!UserData: $userData");
 
       // Extract user details
       final String name = userData['name'] ?? "User";
@@ -100,8 +84,6 @@ Future<Map<String, String>?> fetchUserDetails() async {
           userData['guestIdentifier']; // Can be null for non-guest users
       final String roomNumber = (userData['roomNumber'] ?? '') as String;
       final String phoneNumber = (userData['phoneNumber'] ?? '') as String;
-
-      // print("IS SMCCCC: ${userData['isSMC']}, $isSMC");
 
       prefs.setBool('isSMC', isSMC);
       prefs.setBool('gotMess', gotHostel);
@@ -149,14 +131,11 @@ Future<Map<String, String>?> fetchUserDetails() async {
         'roll': roll,
       };
     } else if (resp.statusCode == 401) {
-      debugPrint("Unauthorized access: Invalid token or session expired.");
       throw Exception('Unauthorized: Please log in again.');
     } else {
-      debugPrint("Error occurred: ${resp.statusCode} - ${resp.reasonPhrase}");
       throw Exception('Failed to fetch user details.');
     }
   } catch (e) {
-    debugPrint("error is: $e");
     rethrow;
   }
 }

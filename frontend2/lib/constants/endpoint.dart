@@ -1,5 +1,5 @@
-const String baseUrl = "https://hab.codingclub.in/api";
-const String authUrl = "https://hab.codingclub.in/api";
+const String baseUrl = "http://10.150.35.78:3000/api";
+const String authUrl = "http://localhost:3000/api";
 
 class NotificationEndpoints {
   static const String registerToken = '$baseUrl/notification/register-token';

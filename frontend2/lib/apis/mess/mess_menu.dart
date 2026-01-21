@@ -18,11 +18,11 @@ Future<List<MenuModel>> fetchMenu(String messId, String day) async {
 
   // Return from cache if available
   if (_menuCache.containsKey(key)) {
-    debugPrint('✅ Returning cached menu for $key');
+    if (kDebugMode) debugPrint('✅ Returning cached menu for $key');
 
     final endTime = DateTime.now();
     final responseTime = endTime.difference(startTime).inMilliseconds;
-    debugPrint("⏱️ fetchMenu Response Time (from cache): $responseTime ms");
+    if (kDebugMode) debugPrint("⏱️ fetchMenu Response Time (from cache): $responseTime ms");
 
     return _menuCache[key]!;
   }
@@ -35,7 +35,7 @@ Future<List<MenuModel>> fetchMenu(String messId, String day) async {
       throw Exception('⚠️ Access token not found');
     }
 
-    debugPrint('📤 Fetching menu for Mess ID: $messId, Day: $day');
+    if (kDebugMode) debugPrint('📤 Fetching menu for Mess ID: $messId, Day: $day');
 
     final response = await DioClient().dio.post(
       '$baseUrl/mess/menu/$messId',
@@ -53,25 +53,25 @@ Future<List<MenuModel>> fetchMenu(String messId, String day) async {
       final menu =
           data.map<MenuModel>((json) => MenuModel.fromJson(json)).toList();
       _menuCache[key] = menu;
-      debugPrint(response.data.toString());
-      debugPrint('✅ Menu fetched and cached for $key');
+      if (kDebugMode) debugPrint(response.data.toString());
+      if (kDebugMode) debugPrint('✅ Menu fetched and cached for $key');
 
       final endTime = DateTime.now();
       final responseTime = endTime.difference(startTime).inMilliseconds;
-      debugPrint("⏱️ fetchMenu Response Time (from API): $responseTime ms");
+      if (kDebugMode) debugPrint("⏱️ fetchMenu Response Time (from API): $responseTime ms");
 
       return menu;
     } else {
       throw Exception('❌ Server responded with status: ${response.statusCode}');
     }
   } on DioException catch (dioError) {
-    debugPrint('❌ DioException: ${dioError.toString()}');
+    if (kDebugMode) debugPrint('❌ DioException: ${dioError.toString()}');
     if (dioError.response != null) {
-      debugPrint('❌ Response Data: ${dioError.response?.data}');
+      if (kDebugMode) debugPrint('❌ Response Data: ${dioError.response?.data}');
     }
     throw Exception('Failed to fetch menu: ${dioError.toString()}');
   } catch (e) {
-    debugPrint('❌ Unexpected error: $e');
+    if (kDebugMode) debugPrint('❌ Unexpected error: $e');
     throw Exception('Unexpected error while fetching menu');
   }
 }
