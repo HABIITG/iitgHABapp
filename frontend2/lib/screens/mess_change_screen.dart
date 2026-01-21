@@ -74,7 +74,6 @@ class _MessChangeScreenState extends State<MessChangeScreen> {
     final prefs = await SharedPreferences.getInstance();
     final clicked = prefs.getBool('buttonpressed') ?? false;
     final gotMess1 = prefs.getBool('gotMess') ?? false;
-    debugPrint("you pressed : $clicked");
     // Update the state based on the condition
 
     setState(() {
@@ -82,7 +81,6 @@ class _MessChangeScreenState extends State<MessChangeScreen> {
       isSubmitted = clicked;
       gotMess = gotMess1;
     });
-    debugPrint("isSubmitted is: $isSubmitted");
   }
 
   void getAllocatedHostel() async {
@@ -114,7 +112,6 @@ class _MessChangeScreenState extends State<MessChangeScreen> {
         _isloading = false; // Hide the loading indicator imp
       });
     } else {
-      debugPrint("Failed to load user details.");
       setState(() {
         _isloading =
             false; // Hide the loading indicator if data fetching fails need to keep track of stuff

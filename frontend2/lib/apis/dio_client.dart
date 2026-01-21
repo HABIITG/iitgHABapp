@@ -1,5 +1,5 @@
 import 'package:dio/dio.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:frontend2/utilities/version_checker.dart';
 
 class DioClient {
@@ -33,7 +33,7 @@ class DioClient {
         });
         
         // Helpful Debug Log
-        debugPrint("Request: ${options.uri} | Headers: ${options.headers}");
+        if (kDebugMode) debugPrint("Request: ${options.uri} | Headers: ${options.headers}");
         
         return handler.next(options);
       },

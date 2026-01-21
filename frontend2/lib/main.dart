@@ -11,7 +11,6 @@ import 'package:frontend2/apis/users/user.dart';
 import 'package:frontend2/providers/feedback_provider.dart';
 import 'package:frontend2/providers/hostels.dart';
 import 'package:frontend2/screens/main_navigation_screen.dart';
-import 'package:frontend2/screens/home_screen.dart';
 import 'package:frontend2/screens/initial_setup_screen.dart';
 import 'package:frontend2/screens/login_screen.dart';
 import 'package:frontend2/screens/mess_screen.dart';
@@ -174,7 +173,6 @@ class _MyAppState extends State<MyApp> {
       routes: {
         '/home': (context) => const MainNavigationScreen(),
         '/mess': (context) => const MessScreen(),
-        '/complaints': (context) => const HomeScreen(),
       },
     );
   }

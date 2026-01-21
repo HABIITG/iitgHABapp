@@ -1,5 +1,6 @@
 // ignore_for_file: file_names
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:frontend2/apis/dio_client.dart';
@@ -33,7 +34,7 @@ class _FeedbackCardState extends State<FeedbackCard> {
   }
 
   void _onRefreshNotified() {
-    debugPrint("🔄 FeedbackCard refresh triggered");
+    if (kDebugMode) debugPrint("🔄 FeedbackCard refresh triggered");
     _checkFeedbackStatus();
     _fetchWindowTimeLeft();
   }
@@ -56,31 +57,33 @@ class _FeedbackCardState extends State<FeedbackCard> {
         // Get auth token
         final prefs = await SharedPreferences.getInstance();
         final token = prefs.getString('access_token');
-        debugPrint("FEEDBACK: Open");
+        if (kDebugMode) debugPrint("FEEDBACK: Open");
         if (token != null) {
           // Check if user has already submitted feedback
-          debugPrint("FEEDBACK: Checking submission status");
+          if (kDebugMode) debugPrint("FEEDBACK: Checking submission status");
           final submittedRes = await dio.get(
             MessFeedback.feedbackSubmitted,
             options: Options(
               headers: {"Authorization": "Bearer $token"},
             ),
           );
-          debugPrint(
-              "FEEDBACK: Submission status: ${submittedRes.data['submitted']}");
+          if (kDebugMode) {
+            debugPrint(
+                "FEEDBACK: Submission status: ${submittedRes.data['submitted']}");
+          }
           setState(() {
             _submitted = submittedRes.data['submitted'] == true;
             _windowOpen = true;
             _loading = false;
           });
-          debugPrint("FEEDBACK: Submission status checked");
+          if (kDebugMode) debugPrint("FEEDBACK: Submission status checked");
         } else {
           setState(() {
             _submitted = false;
             _windowOpen = true;
             _loading = false;
           });
-          debugPrint("FEEDBACK: No token found");
+          if (kDebugMode) debugPrint("FEEDBACK: No token found");
         }
       } else {
         setState(() {

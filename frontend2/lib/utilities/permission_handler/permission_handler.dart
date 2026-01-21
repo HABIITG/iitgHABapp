@@ -10,9 +10,9 @@ class PermissionHandler {
       if (status.isGranted) {
         onGranted();
       } else if (status.isDenied) {
-        debugPrint("Camera permission denied");
+        if (kDebugMode) debugPrint("Camera permission denied");
       } else if (status.isPermanentlyDenied) {
-        debugPrint("Camera permission permanently denied");
+        if (kDebugMode) debugPrint("Camera permission permanently denied");
         openAppSettings();
       }
     } else {

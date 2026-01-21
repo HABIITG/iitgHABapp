@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:frontend2/apis/dio_client.dart';
 import '../constants/endpoint.dart';
@@ -15,17 +14,17 @@ class MessInfoProvider with ChangeNotifier {
 
   Future<void> fetchMessID() async {
     try {
-      debugPrint('api calling');
+      if (kDebugMode) debugPrint('api calling');
       final dio = DioClient().dio;
       final response = await dio.post(MessInfo.getMessInfo);
       if (response.statusCode == 200) {
         final data = response.data as List;
-        debugPrint('data is $data');
+        if (kDebugMode) debugPrint('data is $data');
         _messList = data.map((e) => MessInfoModel.fromJson(e)).toList();
         _hostelMap = mapHostelsByName(_messList);
       }
     } catch (e) {
-      debugPrint('API Error: $e');
+      if (kDebugMode) debugPrint('API Error: $e');
       _messList = [];
     } finally {
       isLoading = false;

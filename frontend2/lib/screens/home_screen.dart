@@ -6,14 +6,13 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:frontend2/screens/initial_setup_screen.dart';
 import 'package:frontend2/screens/profile_screen.dart';
 import 'package:frontend2/screens/qr_scanner.dart';
-import 'package:frontend2/utilities/coming_soon.dart';
 import 'package:frontend2/utilities/notifications.dart';
 import 'package:frontend2/widgets/common/name_trimmer.dart';
 import 'package:frontend2/widgets/mess_widgets/MessMenuBuilder.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../utilities/startupitem.dart';
-import '../widgets/complaint_dropdown.dart';
+import '../widgets/alerts_card.dart';
 import '../widgets/microsoft_required_dialog.dart';
 import 'mess_preference.dart';
 
@@ -79,8 +78,6 @@ class _HomeScreenState extends State<HomeScreen> {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
       currSubscribedMess = prefs.getString('messID') ?? '';
-      debugPrint("mess id: ");
-      debugPrint(currSubscribedMess);
       token = prefs.getString('access_token');
     });
   }
@@ -105,60 +102,6 @@ class _HomeScreenState extends State<HomeScreen> {
       padding: const EdgeInsets.symmetric(vertical: 18.0),
       child: Row(
         children: [
-          Expanded(
-            child: InkWell(
-              borderRadius: BorderRadius.circular(18),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const ComingSoonScreen(),
-                  ),
-                );
-              },
-              child: Container(
-                height: 90,
-                decoration: BoxDecoration(
-                  // color: const Color(0xFFF6F6F6),
-                  color: const Color(0xFFFFFFFF),
-                  borderRadius: BorderRadius.circular(18),
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Container(
-                      width: 40,
-                      height: 40,
-                      decoration: const BoxDecoration(
-                        color: Color(0xFF3754DB),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Center(
-                        child: SvgPicture.asset(
-                          'assets/icon/complaint.svg',
-                          colorFilter: const ColorFilter.mode(
-                              Colors.white, BlendMode.srcIn),
-                          width: 22,
-                          height: 22,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    const Text(
-                      "Complaint",
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.w600,
-                        fontSize: 15,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(width: 16),
           Expanded(
             child: InkWell(
               borderRadius: BorderRadius.circular(18),
@@ -440,7 +383,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
               const SizedBox(height: 24),
-              ComplaintsCard(
+              AlertsCard(
                 feedbackform: feedbackform,
               ),
               buildQuickActions(),

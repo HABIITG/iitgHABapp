@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend2/providers/hostels.dart';
 import 'package:frontend2/widgets/common/popmenubutton.dart';
@@ -50,10 +51,6 @@ class _MessScreenState extends State<MessScreen> {
     setState(() {
       _isLoading = false; // Only now we render
     });
-
-    debugPrint("Mess name: $caterername");
-    debugPrint("Rating: $rating");
-    debugPrint("Rank: $rank");
   }
 
   Future<void> fetchCurrSubscrMess() async {
@@ -172,7 +169,7 @@ class _MenuSectionState extends State<_MenuSection> {
             : (byMessName?.isNotEmpty == true ? byMessName : null);
       });
     });
-    debugPrint("Selected Hostel rn: $selectedHostel");
+    if (kDebugMode) debugPrint("Selected Hostel rn: $selectedHostel");
     _removeHostelListener = HostelsNotifier.addOnChange(
       () {
         if (!mounted) return;

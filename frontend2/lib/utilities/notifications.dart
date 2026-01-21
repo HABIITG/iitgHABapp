@@ -6,6 +6,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:frontend2/models/notification_model.dart';
@@ -91,10 +92,12 @@ Future<void> _saveNotificationToHistory(String title, String body,
 
     // Update the ValueNotifier to notify listeners
     notificationHistoryNotifier.value = notifications;
-    debugPrint(
-        '✅ Saved notification to history: $title: $body (isAlert: $isAlert)');
+    if (kDebugMode) {
+      debugPrint(
+          '✅ Saved notification to history: $title: $body (isAlert: $isAlert)');
+    }
   } catch (e) {
-    debugPrint('❌ Error saving notification to history: $e');
+    if (kDebugMode) debugPrint('❌ Error saving notification to history: $e');
   }
 }
 
@@ -120,7 +123,7 @@ List<NotificationModel> _loadNotificationsFromPrefs() {
 
     return notifications;
   } catch (e) {
-    debugPrint('❌ Error loading notifications: $e');
+    if (kDebugMode) debugPrint('❌ Error loading notifications: $e');
     return [];
   }
 }
@@ -138,8 +141,10 @@ List<NotificationModel> _cleanupExpiredNotifications(
   if (filtered.length != notifications.length) {
     _sharedPrefs?.setStringList(
         'notifications', filtered.map((n) => jsonEncode(n.toJson())).toList());
-    debugPrint(
-        '🧹 Cleaned up ${notifications.length - filtered.length} expired notifications');
+    if (kDebugMode) {
+      debugPrint(
+          '🧹 Cleaned up ${notifications.length - filtered.length} expired notifications');
+    }
   }
 
   return filtered;
@@ -153,7 +158,7 @@ Future<void> _updateNotificationsInPrefs(
     await _sharedPrefs?.setStringList('notifications', jsonList);
     notificationHistoryNotifier.value = notifications;
   } catch (e) {
-    debugPrint('❌ Error updating notifications: $e');
+    if (kDebugMode) debugPrint('❌ Error updating notifications: $e');
   }
 }
 
@@ -164,10 +169,10 @@ Future<void> markNotificationAsRead(int index) async {
     if (index >= 0 && index < notifications.length) {
       notifications[index] = notifications[index].copyWith(isRead: true);
       await _updateNotificationsInPrefs(notifications);
-      debugPrint('✅ Marked notification $index as read');
+      if (kDebugMode) debugPrint('✅ Marked notification $index as read');
     }
   } catch (e) {
-    debugPrint('❌ Error marking notification as read: $e');
+    if (kDebugMode) debugPrint('❌ Error marking notification as read: $e');
   }
 }
 
@@ -177,9 +182,9 @@ Future<void> markAllNotificationsAsRead() async {
     List<NotificationModel> notifications = _loadNotificationsFromPrefs();
     notifications = notifications.map((n) => n.copyWith(isRead: true)).toList();
     await _updateNotificationsInPrefs(notifications);
-    debugPrint('✅ Marked all notifications as read');
+    if (kDebugMode) debugPrint('✅ Marked all notifications as read');
   } catch (e) {
-    debugPrint('❌ Error marking all notifications as read: $e');
+    if (kDebugMode) debugPrint('❌ Error marking all notifications as read: $e');
   }
 }
 
@@ -197,11 +202,15 @@ List<NotificationModel> getActiveAlerts() {
 
 // ✅ Background message handler (must be top-level function)
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  debugPrint('💤 Handling background message: ${message.messageId}');
-  debugPrint('💤 Message data: ${message.data}');
+  if (kDebugMode) {
+    debugPrint('💤 Handling background message: ${message.messageId}');
+    debugPrint('💤 Message data: ${message.data}');
+  }
   if (message.notification != null) {
-    debugPrint(
-        '💤 Message also contained a notification: ${message.notification}');
+    if (kDebugMode) {
+      debugPrint(
+          '💤 Message also contained a notification: ${message.notification}');
+    }
     final redirectType = message.data['redirectType'];
     final isAlert =
         message.data['isAlert'] == 'true' || message.data['isAlert'] == true;
@@ -245,10 +254,14 @@ Future<void> initializeFcm() async {
 
   // ✅ Foreground message handler
   FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-    debugPrint('📩 Foreground message received: ${message.messageId}');
+    if (kDebugMode) {
+      debugPrint('📩 Foreground message received: ${message.messageId}');
+    }
     if (message.notification != null) {
-      debugPrint(
-          '📩 Notification: ${message.notification!.title} - ${message.notification!.body}');
+      if (kDebugMode) {
+        debugPrint(
+            '📩 Notification: ${message.notification!.title} - ${message.notification!.body}');
+      }
       // Save to notification history (this also updates the ValueNotifier)
       final redirectType = message.data['redirectType'];
       final isAlert =
@@ -266,7 +279,7 @@ Future<void> initializeFcm() async {
 
   // ✅ Notification tap handler (when app is opened via notification)
   FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-    debugPrint('🚀 Notification opened: ${message.data}');
+    if (kDebugMode) debugPrint('🚀 Notification opened: ${message.data}');
     if (message.notification != null) {
       final redirectType = message.data['redirectType'];
       final isAlert =
@@ -285,7 +298,7 @@ Future<void> initializeFcm() async {
   // Handle notification when app is opened from terminated state
   FirebaseMessaging.instance.getInitialMessage().then((RemoteMessage? message) {
     if (message != null && message.notification != null) {
-      debugPrint('🔁 App opened from terminated via notification');
+      if (kDebugMode) debugPrint('🔁 App opened from terminated via notification');
       final redirectType = message.data['redirectType'];
       final isAlert =
           message.data['isAlert'] == 'true' || message.data['isAlert'] == true;
@@ -306,7 +319,7 @@ void _handleNotificationNavigation(Map<String, dynamic> data) {
   if (data['redirectType'] == null) return;
 
   final redirectType = data['redirectType'] as String;
-  debugPrint('📍 Handling redirect: $redirectType');
+  if (kDebugMode) debugPrint('📍 Handling redirect: $redirectType');
 
   // Map redirect types to tab indices
   int? targetTab;
@@ -324,13 +337,13 @@ void _handleNotificationNavigation(Map<String, dynamic> data) {
       deepNavigationNotifier.value = 'profile_screen';
       break;
     default:
-      debugPrint('📍 Unknown redirect type: $redirectType');
+      if (kDebugMode) debugPrint('📍 Unknown redirect type: $redirectType');
       return;
   }
 
   // Trigger navigation to the appropriate tab
   tabNavigationNotifier.value = targetTab;
-  debugPrint('📍 Navigated to tab: $targetTab');
+  if (kDebugMode) debugPrint('📍 Navigated to tab: $targetTab');
 }
 
 // ✅ Helper function to display local notification in foreground
@@ -360,7 +373,7 @@ void _showLocalNotification(
 // ✅ Handler for local notification taps
 @pragma('vm:entry-point')
 void _onNotificationTap(NotificationResponse response) {
-  debugPrint('🔔 Local notification tapped: ${response.payload}');
+  if (kDebugMode) debugPrint('🔔 Local notification tapped: ${response.payload}');
   if (response.payload != null && response.payload!.isNotEmpty) {
     final redirectType = response.payload!;
     _handleNotificationNavigation({'redirectType': redirectType});
@@ -374,7 +387,7 @@ Future<void> registerFcmToken() async {
 
     // Return early if user is not authenticated
     if (header == 'error') {
-      debugPrint('⚠️ Cannot register FCM token: User not authenticated');
+      if (kDebugMode) debugPrint('⚠️ Cannot register FCM token: User not authenticated');
       return;
     }
 
@@ -414,7 +427,7 @@ Future<void> registerFcmToken() async {
 
     String? token = await FirebaseMessaging.instance.getToken();
     if (token == null) {
-      debugPrint('❌ No FCM token received');
+      if (kDebugMode) debugPrint('❌ No FCM token received');
       return;
     }
 
@@ -425,7 +438,7 @@ Future<void> registerFcmToken() async {
       // Get fresh access token for each refresh
       final freshHeader = await getAccessToken();
       if (freshHeader == 'error') {
-        debugPrint('⚠️ Cannot re-register FCM token: User not authenticated');
+        if (kDebugMode) debugPrint('⚠️ Cannot re-register FCM token: User not authenticated');
         return;
       }
 
@@ -440,12 +453,12 @@ Future<void> registerFcmToken() async {
         data: jsonEncode({'fcmToken': fcmToken}), // ✅ Use fcmToken here
       );
       if (res.statusCode == 200) {
-        debugPrint('🔄 FCM token re-registered: $fcmToken');
+        if (kDebugMode) debugPrint('🔄 FCM token re-registered: $fcmToken');
       } else {
-        debugPrint('❌ Failed to re-register token');
+        if (kDebugMode) debugPrint('❌ Failed to re-register token');
       }
     }).onError((err) {
-      debugPrint('❌ Failed to re-register token: $err');
+      if (kDebugMode) debugPrint('❌ Failed to re-register token: $err');
     });
 
     // ✅ Register the current token
@@ -460,19 +473,19 @@ Future<void> registerFcmToken() async {
       data: jsonEncode({'fcmToken': token}),
     );
 
-    debugPrint('3');
+    if (kDebugMode) debugPrint('3');
     if (res.statusCode == 200) {
-      debugPrint('✅ FCM token registered: $token');
+      if (kDebugMode) debugPrint('✅ FCM token registered: $token');
 
       // Send welcome notification after successful token registration
       // This ensures the FCM token exists before sending
       await _sendWelcomeNotificationIfNeeded(header);
     } else {
-      debugPrint('❌ Failed to register token');
+      if (kDebugMode) debugPrint('❌ Failed to register token');
     }
   } catch (e) {
-    debugPrint('4');
-    debugPrint('❌ Error registering FCM token: $e');
+    if (kDebugMode) debugPrint('4');
+    if (kDebugMode) debugPrint('❌ Error registering FCM token: $e');
   }
 }
 
@@ -498,12 +511,12 @@ Future<void> _sendWelcomeNotificationIfNeeded(String authToken) async {
       if (res.statusCode == 200) {
         // Mark as sent to avoid duplicate notifications
         await prefs.setBool('welcome_notification_sent', true);
-        debugPrint('✅ Welcome notification sent');
+        if (kDebugMode) debugPrint('✅ Welcome notification sent');
       }
     }
   } catch (e) {
     // Silently fail - welcome notification is not critical
-    debugPrint('⚠️ Failed to send welcome notification: $e');
+    if (kDebugMode) debugPrint('⚠️ Failed to send welcome notification: $e');
   }
 }
 
@@ -512,7 +525,7 @@ Future<void> listenNotifications() async {
   await setupNotificationChannel();
   await FirebaseMessaging.instance.requestPermission();
   await initializeFcm(); // Initialize handlers after permission granted
-  debugPrint('✅ Notification listeners initialized');
+  if (kDebugMode) debugPrint('✅ Notification listeners initialized');
 }
 
 // ✅ Helper function to get notification history from SharedPreferences
@@ -523,7 +536,7 @@ Future<List<NotificationModel>> getNotificationHistory() async {
     notifications = _cleanupExpiredNotifications(notifications);
     return notifications;
   } catch (e) {
-    debugPrint('❌ Error getting notification history: $e');
+    if (kDebugMode) debugPrint('❌ Error getting notification history: $e');
     return [];
   }
 }
