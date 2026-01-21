@@ -91,8 +91,21 @@ const deleteall = async (req, res) => {
   }
 }
 
+// Get total count of all scan logs
+const getTotalScanLogsCount = async (req, res) => {
+  try {
+    const totalCount = await ScanLogs.countDocuments({});
+    res.status(200).json({ total: totalCount });
+  }
+  catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+}
+
 module.exports = {
   statsByDate,
   createLogs,
-  deleteall
+  deleteall,
+  getTotalScanLogsCount
 }

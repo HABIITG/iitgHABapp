@@ -378,23 +378,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
   }
 
-  Future<void> _openTermsOfService() async {
-    const url = 'https://hab.codingclub.in/terms';
-    final uri = Uri.parse(url);
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
-    } else {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Could not open terms of service page'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
-    }
-  }
-
   Future<void> _showAboutDialog() async {
     const url = 'https://hab.codingclub.in';
     final uri = Uri.parse(url);
@@ -485,15 +468,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         trailing: Icon(Icons.chevron_right,
                             color: Colors.grey[400], size: 20),
                         onTap: _reportBug,
-                      ),
-                      const Divider(height: 1, indent: 56),
-                      ListTile(
-                        leading:
-                            const Icon(Icons.description_outlined, size: 22),
-                        title: const Text('Terms of Service'),
-                        trailing: Icon(Icons.chevron_right,
-                            color: Colors.grey[400], size: 20),
-                        onTap: _openTermsOfService,
                       ),
                       const Divider(height: 1, indent: 56),
                       ListTile(
