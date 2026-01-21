@@ -1,5 +1,14 @@
 const { User } = require("./userModel.js");
 const { Hostel } = require("../hostel/hostelModel.js");
+const mongoose = require("mongoose");
+const Feedback = require("../feedback/feedbackModel.js");
+const { ScanLogs } = require("../mess/ScanLogsModel.js");
+const FCMToken = require("../notification/FCMToken.js");
+const Notification = require("../notification/notificationModel.js");
+const { MenuItem } = require("../mess/menuItemModel.js");
+const { MessChange } = require("../mess_change/messChangeModel.js");
+const UserAllocHostel = require("../hostel/hostelAllocModel.js");
+const AppError = require("../../utils/appError.js");
 
 const getUserData = async (req, res, next) => {
   //console.log(req);
@@ -233,6 +242,121 @@ const getUsersByHostelForMess = async (req, res) => {
   }
 };
 
+// Delete user account (hard delete after anonymization)
+const deleteUserAccount = async (req, res, next) => {
+  try {
+    const userId = req.user._id;
+    const user = await User.findById(userId);
+    
+    if (!user) {
+      return next(new AppError(404, "User not found"));
+    }
+    
+    // Check for pending mess change applications
+    const hasPendingMessChange = user.applied_for_mess_changed && 
+                                 !user.got_mess_changed;
+    
+    if (hasPendingMessChange) {
+      return next(new AppError(400, "Cannot delete account with pending mess change application. Please wait for processing or contact admin to cancel."));
+    }
+    
+    // Check if user is SMC member
+    if (user.isSMC === true) {
+      return next(new AppError(403, "SMC members cannot delete their accounts. Please contact admin."));
+    }
+    
+    // Anonymized user ID for references
+    const ANONYMIZED_USER_ID = new mongoose.Types.ObjectId('000000000000000000000000');
+    
+    // Start transaction for atomic operations
+    const session = await mongoose.startSession();
+    session.startTransaction();
+    
+    try {
+      // 1. FCM Tokens - DELETE (no historical value)
+      await FCMToken.deleteMany({ user: userId }, { session });
+      
+      // 2. Notifications - Remove user from recipients and readBy
+      await Notification.updateMany(
+        { recipients: userId },
+        { $pull: { recipients: userId } },
+        { session }
+      );
+      await Notification.updateMany(
+        { readBy: userId },
+        { $pull: { readBy: userId } },
+        { session }
+      );
+      
+      // 3. Menu Item Likes - Remove user from likes arrays
+      await MenuItem.updateMany(
+        { likes: userId },
+        { $pull: { likes: userId } },
+        { session }
+      );
+      
+      // 4. Feedback - Anonymize user reference only (keep feedback content unchanged)
+      await Feedback.updateMany(
+        { user: userId },
+        { $set: { user: ANONYMIZED_USER_ID } },
+        { session }
+      );
+      
+      // 5. Scan Logs - Anonymize (keep historical scan data)
+      await ScanLogs.updateMany(
+        { userId: userId },
+        { $set: { userId: ANONYMIZED_USER_ID } },
+        { session }
+      );
+      
+      // 6. Update UserAllocHostel with user's final hostel and mess before deletion
+      if (user.rollNumber && user.hostel && user.curr_subscribed_mess) {
+        await UserAllocHostel.updateOne(
+          { rollno: user.rollNumber },
+          { 
+            $set: { 
+              hostel: user.hostel,
+              current_subscribed_mess: user.curr_subscribed_mess
+            } 
+          },
+          { session }
+        );
+      }
+      
+      // 7. Anonymize MessChange records (update userName)
+      if (user.rollNumber) {
+        await MessChange.updateMany(
+          { rollNumber: user.rollNumber },
+          { $set: { userName: "Deleted User" } },
+          { session }
+        );
+      }
+      
+      // 8. Hard delete user account
+      await User.findByIdAndDelete(userId, { session });
+      
+      // Commit transaction
+      await session.commitTransaction();
+      
+      return res.status(200).json({ 
+        success: true,
+        message: "Account deleted successfully",
+        note: "Your account has been deleted. Historical data has been anonymized for institutional records."
+      });
+      
+    } catch (error) {
+      await session.abortTransaction();
+      throw error;
+    } finally {
+      session.endSession();
+    }
+    
+  } catch (err) {
+    console.error("Error deleting user account:", err);
+    return next(new AppError(500, "Account deletion failed"));
+  }
+};
+
 module.exports = {
   getUserData,
   createUser,
@@ -245,4 +369,5 @@ module.exports = {
   getUserByRoll,
   getAllUsers,
   getUsersByHostelForMess,
+  deleteUserAccount,
 };

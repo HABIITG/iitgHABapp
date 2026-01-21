@@ -13,6 +13,7 @@ const {
   getUserByRoll,
   getAllUsers,
   getUsersByHostelForMess,
+  deleteUserAccount,
 } = require("./userController.js");
 
 const userRouter = express.Router();
@@ -110,7 +111,42 @@ userRouter.get("/", authenticateJWT, getUserData);
 
 userRouter.post("/save", authenticateJWT, saveUserProfile);
 
-userRouter.get("/roll/:qr", getUserByRoll); //removed authenticateJWT from here
+userRouter.get("/roll/:qr", getUserByRoll);
+
+/**
+ * @swagger
+ * /api/users/account:
+ *   delete:
+ *     summary: "Delete user account"
+ *     tags: ["User"]
+ *     description: "Deletes the authenticated user's account. Anonymizes historical data and removes user completely."
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: "Account deleted successfully"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: "Account deleted successfully"
+ *                 note:
+ *                   type: string
+ *                   example: "Your account has been deleted. Historical data has been anonymized for institutional records."
+ *       400:
+ *         description: "Cannot delete account (pending mess change)"
+ *       403:
+ *         description: "Cannot delete account (SMC member)"
+ *       500:
+ *         description: "Server error"
+ */
+userRouter.delete("/account", authenticateJWT, deleteUserAccount); //removed authenticateJWT from here
 
 /**
  * @swagger

@@ -59,6 +59,9 @@ const {
 const {
   initializeGuestCleanupScheduler,
 } = require("./modules/auth/autoGuestCleanupScheduler.js");
+const {
+  initializeAnonymizedUser,
+} = require("./modules/user/anonymizedUserInit.js");
 const messChangeRouter = require("./modules/mess_change/messchangeRoute.js");
 require("dotenv").config();
 
@@ -153,6 +156,9 @@ mongoose
     initializeFeedbackAutoScheduler();
     initializeMessChangeAutoScheduler();
     initializeGuestCleanupScheduler();
+    
+    // Initialize anonymized user for soft-deleted account references
+    initializeAnonymizedUser();
   })
   .catch((err) => console.log(err));
 

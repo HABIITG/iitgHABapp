@@ -6,6 +6,8 @@ import 'package:frontend2/constants/endpoint.dart';
 import 'package:frontend2/screens/initial_setup_screen.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:dio/dio.dart';
+import 'package:frontend2/apis/dio_client.dart';
 
 /// Update the authenticated user's roomNumber and phoneNumber via server
 /// Returns true on success, false otherwise.
@@ -215,5 +217,50 @@ Future<void> fetchUserProfilePicture() async {
   } catch (e) {
     // Any error — clear cached picture so app shows default
     await prefs.setString('profilePicture', '');
+  }
+}
+
+/// Delete user account
+/// Returns void on success, throws exception on error
+Future<void> deleteUserAccount() async {
+  try {
+    final token = await getAccessToken();
+    if (token == 'error') {
+      throw Exception('Not authenticated');
+    }
+
+    final dio = DioClient().dio;
+    final response = await dio.delete(
+      '$baseUrl/users/account',
+      options: Options(
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+      ),
+    );
+
+    if (response.statusCode == 200) {
+      return; // Success
+    } else {
+      final message = response.data['message'] ?? 'Failed to delete account';
+      final code = response.data['code'];
+
+      if (code == 'PENDING_MESS_CHANGE') {
+        throw Exception(
+            'Cannot delete account with pending mess change application. '
+            'Please wait for processing or contact admin.');
+      } else if (code == 'SMC_MEMBER') {
+        throw Exception(
+            'SMC members cannot delete their accounts. Please contact admin.');
+      }
+      throw Exception(message);
+    }
+  } catch (e) {
+    if (e is DioException) {
+      final message = e.response?.data['message'] ?? 'Network error';
+      throw Exception(message);
+    }
+    rethrow;
   }
 }

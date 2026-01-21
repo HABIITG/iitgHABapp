@@ -9,11 +9,11 @@ import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:frontend2/apis/authentication/login.dart';
 import 'package:frontend2/apis/protected.dart';
 import 'package:frontend2/apis/users/user.dart';
 import 'package:frontend2/constants/endpoint.dart';
 import 'package:frontend2/screens/initial_setup_screen.dart';
+import 'package:frontend2/screens/settings_screen.dart';
 import 'package:frontend2/utilities/notifications.dart';
 import 'package:frontend2/widgets/common/custom_linear_progress.dart';
 import 'package:frontend2/widgets/common/hostel_name.dart';
@@ -526,14 +526,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
               const SizedBox(width: 12),
               Expanded(
                 child: OutlinedButton(
-                  onPressed: () => _showSignOutDialog(context),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const SettingsScreen(),
+                      ),
+                    );
+                  },
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 14),
-                    side: BorderSide(color: Colors.red[400]!, width: 1.2),
+                    side:
+                        const BorderSide(color: Color(0xFF6149CD), width: 1.2),
                   ),
-                  child: Text(
-                    'Logout',
-                    style: TextStyle(color: Colors.red[400]),
+                  child: const Text(
+                    'Settings',
+                    style: TextStyle(color: Color(0xFF6149CD)),
                   ),
                 ),
               ),
@@ -700,41 +708,5 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Future<bool> _checkMicrosoftLink() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getBool('hasMicrosoftLinked') ?? false;
-  }
-
-  void _showSignOutDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          title: const Text('Logout',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
-          content: const Text('Are you sure you want to logout?',
-              style: TextStyle(fontSize: 14, color: Colors.black87)),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text('Cancel',
-                  style: TextStyle(color: Colors.grey[600], fontSize: 14)),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-                logoutHandler(context);
-              },
-              child: Text('Logout',
-                  style: TextStyle(
-                      color: Colors.red[400],
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600)),
-            ),
-          ],
-        );
-      },
-    );
   }
 }
