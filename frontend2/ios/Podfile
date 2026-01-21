@@ -56,6 +56,17 @@ post_install do |installer|
         config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '15.5'
       end
       
+      # Disable Mac Catalyst (Flutter doesn't use Mac Catalyst)
+      config.build_settings['SUPPORTS_MACCATALYST'] = 'NO'
+      config.build_settings['SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD'] = 'NO'
+      
+      # Disable Apple Vision Pro support
+      config.build_settings['SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD'] = 'NO'
+      
+      # Set supported platforms to iPhone only (1 = iPhone, 2 = iPad)
+      config.build_settings['SUPPORTED_PLATFORMS'] = 'iphoneos iphonesimulator'
+      config.build_settings['TARGETED_DEVICE_FAMILY'] = '1'
+      
       # Permission handler preprocessor definitions
       # Only include permissions actually used by the app
       config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] ||= [
@@ -70,5 +81,13 @@ post_install do |installer|
         'PERMISSION_NOTIFICATIONS=1',
       ]
     end
+  end
+  
+  # Configure the Pods project itself
+  installer.pods_project.build_configurations.each do |config|
+    config.build_settings['SUPPORTS_MACCATALYST'] = 'NO'
+    config.build_settings['SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD'] = 'NO'
+    config.build_settings['SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD'] = 'NO'
+    config.build_settings['TARGETED_DEVICE_FAMILY'] = '1'
   end
 end
